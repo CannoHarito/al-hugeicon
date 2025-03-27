@@ -18,11 +18,36 @@
   rel="stylesheet"
   href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
 >
+<style>
+  [id="$preview"] {
+    background-color: #fff;
+    --line: linear-gradient(
+      45deg,
+      #ddd 25%,
+      transparent 25%,
+      transparent 75%,
+      #ddd 75%,
+      #ddd
+    );
+    background-image:
+      var(--line),
+      var(--line);
+    background-repeat: repeat;
+    background-size: 32px 32px;
+    background-position: 0 0, 16px 16px;
+    & svg {
+      width: 100%;
+    }
+  }
+  [role="group"] > input[type="color"] {
+    max-width: 50%;
+  }
+</style>
 
 <header class="container">
   <hgroup>
     <h1>AL-HugeIcon</h1>
-    <p>アサルトリリィ ヒュージのアイコン作成ツール</p>
+    <p>アサルトリリィ ヒュージアイコン作成ツール</p>
   </hgroup>
 </header>
 <main class="container grid">
@@ -30,11 +55,10 @@
     <form name="color" id="$color">
       <h4>色設定</h4>
       <fieldset role="group">
-        <input type="color" name="bgcolor" value="#ffffff"><label><input
-            type="checkbox"
-            name="bgtransparent"
-            role="switch"
-          ><br>透明</label>
+        <input type="color" name="bgcolor" value="#ffffff">
+        <label role="button" class="secondary">
+          <input type="checkbox" name="bgtransparent" role="switch">透明
+        </label>
       </fieldset>
       <input type="color" name="bodycolor" value="#cccccc">
       <input type="color" name="strokecolor" value="#323232">
@@ -44,9 +68,12 @@
       </fieldset>
       <input id="$reset" type="reset" value="デフォルトに戻す">
     </form>
+  </div>
+  <article>
+    <div id="$preview"></div>
     <form name="output" id="$output">
       <h4>出力設定</h4>
-      <select name="format" value="svg">
+      <select name="format" value="png">
         <option value="svg">SVG</option>
         <option value="png">PNG</option>
         <option value="jpg">JPG</option>
@@ -54,22 +81,6 @@
       </select>
       <input type="submit" value="ダウンロード">
     </form>
-  </div>
-  <article>
-    <div
-      id="$preview"
-      style="background-color: #fff;
-background-image:
-  linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd),
-  linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd);
-background-repeat: repeat;
-background-size: 32px 32px;
-background-position: 0 0, 16px 16px;
-& svg {
-  width: 100%;
-}"
-    >
-    </div>
   </article>
 </main>
 <footer class="container">
