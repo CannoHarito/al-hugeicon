@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AL-HugeIcon</title>
+<meta name="description" content="アサルトリリィのヒュージのアイコン作成ツール">
+<meta property="og:title" content="AL-HugeIcon">
+<meta
+  property="og:description"
+  content="アサルトリリィのヒュージのアイコン作成ツール"
+>
+<meta
+  property="og:image"
+  content="https://i.gyazo.com/69db5ca837ee3d212de5c215573f3f78.png"
+>
+<meta name="twitter:card" content="summary_large_image" />
+<link rel="icon" href="./favicon.svg" type="image/svg+xml">
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+>
+
+<header class="container">
+  <hgroup>
+    <h1>AL-HugeIcon</h1>
+    <p>アサルトリリィ ヒュージのアイコン作成ツール</p>
+  </hgroup>
+</header>
+<main class="container grid">
+  <div>
+    <form name="color" id="$color">
+      <h4>色設定</h4>
+      <fieldset role="group">
+        <input type="color" name="bgcolor" value="#ffffff"><label><input
+            type="checkbox"
+            name="bgtransparent"
+            role="switch"
+          ><br>透明</label>
+      </fieldset>
+      <input type="color" name="bodycolor" value="#cccccc">
+      <input type="color" name="strokecolor" value="#323232">
+      <fieldset role="group">
+        <input type="color" name="hugecolor" value="#80ffa6">
+        <input type="button" id="$random" class="secondary" value="ランダム">
+      </fieldset>
+      <input id="$reset" type="reset" value="デフォルトに戻す">
+    </form>
+    <form name="output" id="$output">
+      <h4>出力設定</h4>
+      <select name="format" value="svg">
+        <option value="svg">SVG</option>
+        <option value="png">PNG</option>
+        <option value="jpg">JPG</option>
+        <option value="webp">WEBP</option>
+      </select>
+      <input type="submit" value="ダウンロード">
+    </form>
+  </div>
+  <article>
+    <div
+      id="$preview"
+      style="background-color: #fff;
+background-image:
+  linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd),
+  linear-gradient(45deg, #ddd 25%, transparent 25%, transparent 75%, #ddd 75%, #ddd);
+background-repeat: repeat;
+background-size: 32px 32px;
+background-position: 0 0, 16px 16px;
+& svg {
+  width: 100%;
+}"
+    >
+    </div>
+  </article>
+</main>
+<footer class="container">
+  <hr>
+  <small>
+    ヒュージのデザインは ©AZONE INTERNATIONAL・acus/アサルトリリィプロジェクト
+    の著作物のファンアートとして作成しています。
+    <p
+      xmlns:cc="http://creativecommons.org/ns#"
+      xmlns:dct="http://purl.org/dc/terms/"
+    >
+      <span property="dct:title">AL-HugeIcon</span> is marked with <a
+        href="https://creativecommons.org/publicdomain/zero/1.0/?ref=chooser-v1"
+        target="_blank"
+        rel="license noopener noreferrer"
+        style="display: inline-block"
+      >CC0 1.0<img
+          style="height: 22px !important; margin-left: 3px; vertical-align: text-bottom"
+          src="https://mirrors.creativecommons.org/presskit/icons/cc.svg?ref=chooser-v1"
+          alt=""
+        ><img
+          style="height: 22px !important; margin-left: 3px; vertical-align: text-bottom"
+          src="https://mirrors.creativecommons.org/presskit/icons/zero.svg?ref=chooser-v1"
+          alt=""
+        ></a>
+    </p>
+  </small>
+</footer>
+<script type="module" src="./main.js"></script>
