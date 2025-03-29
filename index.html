@@ -20,18 +20,14 @@
 >
 <style>
   [id="$preview"] {
+    aspect-ratio: 1;
+    border: #ddd 1px solid;
+    margin-bottom: 0.5em;
     background-color: #fff;
-    --line: linear-gradient(
-      45deg,
-      #ddd 25%,
-      transparent 25%,
-      transparent 75%,
-      #ddd 75%,
-      #ddd
-    );
+    --gra: linear-gradient(45deg, #ddd 25%, #fff0 25% 75%, #ddd 75%);
     background-image:
-      var(--line),
-      var(--line);
+      var(--gra),
+      var(--gra);
     background-repeat: repeat;
     background-size: 32px 32px;
     background-position: 0 0, 16px 16px;
