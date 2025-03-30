@@ -13,8 +13,7 @@ function orbio(o = {}) {
   const svgChildren = [];
   const defsChildren = [];
   if (!o.bgtransparent) {
-    svgChildren.push(`
-<rect x="-256" y="-256" width="100%" height="100%" fill="${bgcolor}"/>`);
+    svgChildren.push(`<rect x="-256" y="-256" width="100%" height="100%" fill="${bgcolor}"/>`);
   }
   defsChildren.push(`<radialGradient id="eyeG">
   <stop stop-color="#fff" offset=".5"/>
@@ -35,6 +34,14 @@ function orbio(o = {}) {
   <use id="eyeB" transform="rotate(240)" href="#eyeA"/>
   <use id="eyeC" transform="rotate(120)" href="#eyeA"/>
 </g>`);
+  if (parts.includes("sumi")) {
+    svgChildren.push(`<g fill="none" stroke="${strokecolor}" stroke-linecap="round" stroke-linejoin="round" stroke-width="2">
+  <path id="sumiP" d="m-126 45h2c7-3 10-7 16-15 3-4 42-4 46 0 8 8 18 26 26 34 4 4 68 4 72 0 8-8 18-26 26-34 4-4 43-4 46 0 6 8 9 12 16 15h2"/>
+  <use transform="scale(1,-1)" href="#sumiP"/>
+  <circle id="sumiC" cx="-60" cy="60" r="6"/>
+  <use transform="scale(-1)" href="#sumiC"/>
+</g>`);
+  }
   const ashiA = `<g id="ashiA" transform="translate(126)" fill="${bodycolor}" stroke="${strokecolor}" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">
   <ellipse rx="12" ry="38" fill="${greycolor}"/>
   <path d="m2-19 41-12v59l-41-9c-3-12-3-25 0-38z"/>
@@ -58,38 +65,68 @@ function orbio(o = {}) {
   <use transform="rotate(144)" href="#hoshiP"/>
   <use transform="rotate(72)" href="#hoshiP"/>
 </g>`);
+    if (parts.includes("hoshia")) {
+      svgChildren.push(
+        `<use transform="translate(80 56) rotate(15)" fill="${hugecolor}" href="#hoshi"/>`
+      );
+    }
+    if (parts.includes("hoshib")) {
+      svgChildren.push(
+        `<use transform="translate(-80 -48) rotate(30)" fill="${hugecolor}" href="#hoshi"/>`
+      );
+    }
   }
-  if (parts.includes("hoshia")) {
-    svgChildren.push(
-      `<use transform="translate(80 56) rotate(15)" fill="${hugecolor}" href="#hoshi"/>`
-    );
+  if (parts.includes("hearta")) {
+    svgChildren.push(`<g transform="translate(84 56)" fill="${hugecolor}" stroke="${strokecolor}" stroke-linejoin="round" stroke-width="5" paint-order="stroke">
+  <path d="m-13 2c-4-4-5-10-3-14 1-3 5-4 8-3s8 6 8 6 5-6 8-6c3-1 6 1 8 3 2 4 1 10-3 14-3 3-13 9-13 9s-10-6-13-9z"/>
+</g>`);
   }
-  if (parts.includes("hoshib")) {
-    svgChildren.push(
-      `<use transform="translate(-80 -48) rotate(30)" fill="${hugecolor}" href="#hoshi"/>`
-    );
-  }
-  const tunoA = `<g id="tunoA" stroke-linejoin="round" stroke-width="4" transform="rotate(32.5 207 85)">
+  if (parts.some((s) => s.startsWith("tuno"))) {
+    defsChildren.push(`<g id="tuno" stroke-linejoin="round" stroke-width="4">
     <path d="m-38 0c6 2 22 4 22 4l12 8c2.67 1.33 5.33 1.33 8 0l12-8s16-2 22-4c3.16-1.05-6-8-6-8-16-20-24-36-28-56 0 0-1-2-4-2s-4 2-4 2c-4 20-12 36-28 56 0 0-9.16 6.95-6 8z" fill="${hugecolor}" stroke="${strokecolor}"/>
     <path id="tunoP" d="m-13 4c4.98-12.8 6.88-28.5 9-44-4 15-9 29-15 43" fill="${strokecolor}" stroke="${strokecolor}" stroke-width="2"/>
     <use transform="scale(-1,1)" href="#tunoP"/>
-</g>`;
-  if (parts.includes("tunoa"))
-    svgChildren.push(tunoA);
-  else if (parts.some((s) => s.startsWith("tuno")))
-    defsChildren.push(tunoA);
-  if (parts.includes("tunob")) {
-    svgChildren.push(`<use transform="scale(-1,1)" href="#tunoA"/>`);
+</g>`);
+    if (parts.includes("tunoa")) {
+      svgChildren.push(
+        `<use transform="translate(76,-96) rotate(32)" href="#tuno"/>`
+      );
+    }
+    if (parts.includes("tunob")) {
+      svgChildren.push(
+        `<use transform="translate(-76,-96) rotate(-32)" href="#tuno"/>`
+      );
+    }
+    if (parts.includes("tunoc")) {
+      svgChildren.push(
+        `<use transform="translate(76,100) rotate(148)" href="#tuno"/>`
+      );
+    }
+    if (parts.includes("tunod")) {
+      svgChildren.push(
+        `<use transform="translate(-76,100) rotate(212)" href="#tuno"/>`
+      );
+    }
   }
-  if (parts.includes("tunoc")) {
-    svgChildren.push(`<use transform="scale(1,-1)" href="#tunoA"/>`);
+  if (parts.some((s) => s.startsWith("drill"))) {
+    defsChildren.push(`<g id="drill" fill="${greycolor}" stroke="${strokecolor}" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">
+  <path d="m28-2-27-63-1-2-1 2-28 63c13 10 45 10 57 0z"/>
+  <path d="m-11-42c7-1 14-4 17-8m-26 29c12 0 28-6 33-14m-36 36c19-3 36-8 43-19" fill="none"/>
+</g>`);
   }
-  if (parts.includes("tunod")) {
-    svgChildren.push(`<use transform="scale(-1)" href="#tunoA"/>`);
+  if (parts.includes("drilla")) {
+    svgChildren.push(
+      `<use transform="translate(76,-96) rotate(28)" href="#drill"/>`
+    );
+  }
+  if (parts.includes("drillb")) {
+    svgChildren.push(
+      `<use transform="translate(-76,-96) rotate(-28)" href="#drill"/>`
+    );
   }
   return [
     `<svg viewBox="-256 -256 512 512" xmlns="http://www.w3.org/2000/svg">`,
-    `<style>${o.style || ""}</style>`,
+    ...o.style ? [`<style>`, o.style, `</style>`] : [],
     `<defs>`,
     ...defsChildren,
     `</defs>`,
