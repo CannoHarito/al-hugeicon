@@ -20,18 +20,14 @@
 >
 <style>
   [id="$preview"] {
+    aspect-ratio: 1;
+    border: #ddd 1px solid;
+    margin-bottom: 0.5em;
     background-color: #fff;
-    --line: linear-gradient(
-      45deg,
-      #ddd 25%,
-      transparent 25%,
-      transparent 75%,
-      #ddd 75%,
-      #ddd
-    );
+    --gra: linear-gradient(45deg, #ddd 25%, #fff0 25% 75%, #ddd 75%);
     background-image:
-      var(--line),
-      var(--line);
+      var(--gra),
+      var(--gra);
     background-repeat: repeat;
     background-size: 32px 32px;
     background-position: 0 0, 16px 16px;
@@ -52,6 +48,55 @@
 </header>
 <main class="container grid">
   <div>
+    <form name="parts" id="$parts">
+      <details class="dropdown">
+        <summary role="button" class="outline secondary">
+          パーツ選択
+        </summary>
+        <ul>
+          <li>
+            <label><input type="checkbox" name="hoshia" checked />星右</label>
+          </li>
+          <li>
+            <label><input type="checkbox" name="hoshib" />星左</label>
+          </li>
+          <li>
+            <label><input type="checkbox" name="hearta" />ハート右</label>
+          </li>
+          <li>
+            <label><input type="checkbox" name="sumi" />スミ入れ</label>
+          </li>
+          <li>
+            <label>
+              <input type="checkbox" name="tunoa" checked />ツノ右上</label>
+          </li>
+          <li>
+            <label>
+              <input type="checkbox" name="tunob" checked />ツノ左上</label>
+          </li>
+          <li>
+            <label>
+              <input type="checkbox" name="tunoc" checked />ツノ右下</label>
+          </li>
+          <li>
+            <label>
+              <input type="checkbox" name="tunod" checked />ツノ左下</label>
+          </li>
+          <li>
+            <label><input type="checkbox" name="drilla" />ドリル右上</label>
+          </li>
+          <li>
+            <label><input type="checkbox" name="drillb" />ドリル左上</label>
+          </li>
+          <li>
+            <label><input type="checkbox" name="ashia" checked />足右</label>
+          </li>
+          <li>
+            <label><input type="checkbox" name="ashib" checked />足左</label>
+          </li>
+        </ul>
+      </details>
+    </form>
     <form name="color" id="$color">
       <h4>色設定</h4>
       <fieldset role="group">
