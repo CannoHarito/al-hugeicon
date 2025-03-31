@@ -1,20 +1,28 @@
 // main.ts
-function orbio(o = {}) {
-  console.log(o);
-  const {
-    bgcolor = "#fff",
-    bodycolor = "#cccccc",
-    strokecolor = "#323232",
-    hugecolor = "#80ffa6",
-    blackcolor = "#323232",
-    greycolor = "#6e6e6e",
-    parts = ["hoshia", "tunoa", "tunob", "tunoc", "tunod", "ashia", "ashib"]
-  } = o;
+var colorNames = [
+  "bgcolor",
+  "bodycolor",
+  "strokecolor",
+  "hugecolor",
+  "blackcolor",
+  "greycolor"
+];
+function getStyleString(formdata) {
+  const styles = [...formdata].filter(([k]) => colorNames.includes(k)).map(([k, v]) => `--${k}:${v};`);
+  if (!formdata.has("bgtransparent")) {
+    styles.push(`background-color:var(--bgcolor, #fff);`);
+  }
+  return styles.join("");
+}
+function orbio({
+  parts = ["hoshia", "tunoa", "tunob", "tunoc", "tunod", "ashia", "ashib"],
+  color,
+  style
+} = {}) {
+  const svgStyle = color ? getStyleString(color) : "";
+  const bodycolor = "var(--bodycolor, #ccc)", strokecolor = "var(--strokecolor, #323232)", hugecolor = "var(--hugecolor, #80ffa6)", blackcolor = "var(--blackcolor, #323232)", greycolor = "var(--greycolor, #6e6e6e)";
   const svgChildren = [];
   const defsChildren = [];
-  if (!o.bgtransparent) {
-    svgChildren.push(`<rect x="-256" y="-256" width="100%" height="100%" fill="${bgcolor}"/>`);
-  }
   defsChildren.push(`<radialGradient id="eyeG">
   <stop stop-color="#fff" offset=".5"/>
   <stop stop-color="#000" offset="1"/>
@@ -56,8 +64,7 @@ function orbio(o = {}) {
   if (parts.includes("ashib"))
     svgChildren.push(ashiB);
   if (parts.some((s) => s.startsWith("hoshi"))) {
-    defsChildren.push(`/
-<g id="hoshi">
+    defsChildren.push(`<g id="hoshi">
   <path d="m0-25 10.3 10.8 13.5 6.5-7.2 13.1-1.9 14.8-14.7-2.7-14.7 2.7-1.9-14.8-7.1-13.1 13.5-6.4z" stroke="${strokecolor}" stroke-linejoin="round" stroke-width="4"/>
   <path id="hoshiP" d="m-4 17h8l-4-13z" fill="${strokecolor}"/>
   <use transform="rotate(-72)" href="#hoshiP"/>
@@ -83,9 +90,9 @@ function orbio(o = {}) {
   }
   if (parts.some((s) => s.startsWith("tuno"))) {
     defsChildren.push(`<g id="tuno" stroke-linejoin="round" stroke-width="4">
-    <path d="m-38 0c6 2 22 4 22 4l12 8c2.67 1.33 5.33 1.33 8 0l12-8s16-2 22-4c3.16-1.05-6-8-6-8-16-20-24-36-28-56 0 0-1-2-4-2s-4 2-4 2c-4 20-12 36-28 56 0 0-9.16 6.95-6 8z" fill="${hugecolor}" stroke="${strokecolor}"/>
-    <path id="tunoP" d="m-13 4c4.98-12.8 6.88-28.5 9-44-4 15-9 29-15 43" fill="${strokecolor}" stroke="${strokecolor}" stroke-width="2"/>
-    <use transform="scale(-1,1)" href="#tunoP"/>
+  <path d="m-38 0c6 2 22 4 22 4l12 8c2.67 1.33 5.33 1.33 8 0l12-8s16-2 22-4c3.16-1.05-6-8-6-8-16-20-24-36-28-56 0 0-1-2-4-2s-4 2-4 2c-4 20-12 36-28 56 0 0-9.16 6.95-6 8z" fill="${hugecolor}" stroke="${strokecolor}"/>
+  <path id="tunoP" d="m-13 4c4.98-12.8 6.88-28.5 9-44-4 15-9 29-15 43" fill="${strokecolor}" stroke="${strokecolor}" stroke-width="2"/>
+  <use transform="scale(-1,1)" href="#tunoP"/>
 </g>`);
     if (parts.includes("tunoa")) {
       svgChildren.push(
@@ -125,8 +132,8 @@ function orbio(o = {}) {
     );
   }
   return [
-    `<svg viewBox="-256 -256 512 512" xmlns="http://www.w3.org/2000/svg">`,
-    ...o.style ? [`<style>`, o.style, `</style>`] : [],
+    `<svg viewBox="-256 -256 512 512" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
+    ...style ? [`<style>`, style, `</style>`] : [],
     `<defs>`,
     ...defsChildren,
     `</defs>`,
@@ -134,30 +141,35 @@ function orbio(o = {}) {
     `</svg>`
   ].join("\n");
 }
-var queued = false;
-var draw = async () => {
-  if (queued)
-    return;
-  queued = true;
-  await new Promise((r) => setTimeout(r, 100));
-  queued = false;
+var draw = () => {
   $preview.innerText = "";
   $preview.insertAdjacentHTML(
     "beforeend",
-    orbio(
-      Object.fromEntries([
-        ...new FormData($color),
-        ["parts", [...new FormData($parts).keys()]]
-      ])
-    )
+    orbio({
+      parts: [...new FormData($parts).keys()],
+      color: new FormData($color)
+    })
   );
 };
 $parts.onchange = draw;
-$color.oninput = draw;
+var awaiting = false;
+var cooltimePromise = Promise.resolve();
+var setColor = async () => {
+  if (awaiting)
+    return;
+  awaiting = true;
+  await cooltimePromise;
+  awaiting = false;
+  const $svg = $preview.querySelector("svg");
+  if ($svg)
+    $svg.style.cssText = getStyleString(new FormData($color));
+  cooltimePromise = new Promise((r) => setTimeout(() => r(), 100));
+};
+$color.oninput = setColor;
 $reset.onclick = (e) => {
   e.preventDefault();
   $color.reset();
-  draw();
+  setColor();
 };
 var clamp = (n, min, max) => Math.min(max, Math.max(min, n));
 var toRGB = (h = 138, s = 0.5, v = 1) => {
@@ -173,7 +185,7 @@ var toRGB = (h = 138, s = 0.5, v = 1) => {
 };
 $random.onclick = () => {
   $color.hugecolor.value = toRGB(Math.random() * 360);
-  draw();
+  setColor();
 };
 var timestamp = () => (/* @__PURE__ */ new Date()).toLocaleString("sv").replace(" ", "_").replaceAll(/[^\d_]/g, "");
 var download = (url, filebase, format) => {
