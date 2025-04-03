@@ -1,33 +1,6 @@
-declare const $parts: HTMLFormElement;
-declare const $color: HTMLFormElement;
-declare const $random: HTMLInputElement;
-declare const $output: HTMLFormElement;
-declare const $preview: HTMLElement;
-declare const $reset: HTMLInputElement;
+import { DrawOptions, getStyleString } from "./util.ts";
 
-interface DrawOptions {
-  parts: string[];
-  color: FormData;
-  style: string;
-}
-const colorNames = [
-  "bgcolor",
-  "bodycolor",
-  "strokecolor",
-  "hugecolor",
-  "blackcolor",
-  "greycolor",
-];
-function getStyleString(formdata: FormData) {
-  const styles: string[] = [...formdata]
-    .filter(([k]) => colorNames.includes(k))
-    .map(([k, v]) => `--${k}:${v};`);
-  if (!formdata.has("bgtransparent")) {
-    styles.push(`background-color:var(--bgcolor, #fff);`);
-  }
-  return styles.join("");
-}
-function orbio({
+export function orbio({
   parts = ["hoshia", "tunoa", "tunob", "tunoc", "tunod", "ashia", "ashib"],
   color,
   style,
@@ -49,13 +22,18 @@ function orbio({
 </radialGradient>
 <mask id="eyeM">
   <circle r="10" fill="url(#eyeG)"/>  
-</mask>`);
+</mask>
+<path id="bodyO" d="m-30-51-21 37h-99v28h99l22 37h59l21-37h99v-28h-99l-21-37z"/>
+<clipPath id="bodyClip" >
+  <circle r="136"/>
+</clipPath>`);
   svgChildren.push(`\
 <g stroke="${strokecolor}" stroke-linejoin="round" stroke-width="4">
   <circle r="136" fill="${bodycolor}" stroke="none"/>
-  <rect x="-135" y="-19" width="270" height="38" fill="${greycolor}" stroke="none"/>
-  <path d="m-135 18h81l22 38h64l22-38h81m0-36h-81l-22-38h-64l-22 38h-81" fill="${greycolor}"/>
-  <path d="m-28-49-22 37h-85v24h85l22 37h56l21-37h86v-24h-86l-21-37z" fill="${blackcolor}" stroke="none"/>
+  <g clip-path="url(#bodyClip)">
+    <use href="#bodyO" stroke-width="12"/>
+    <use href="#bodyO" fill="${blackcolor}" stroke="${greycolor}"/>
+  </g>
   <circle r="136" fill="none"/>
 </g>
 <g fill="${hugecolor}">
@@ -172,92 +150,3 @@ function orbio({
     `</svg>`,
   ].join("\n");
 }
-
-const draw = () => {
-  $preview.innerText = "";
-  $preview.insertAdjacentHTML(
-    "beforeend",
-    orbio({
-      parts: [...new FormData($parts).keys()],
-      color: new FormData($color),
-    }),
-  );
-};
-$parts.onchange = draw;
-let awaiting = false;
-let cooltimePromise = Promise.resolve();
-const setColor = async () => {
-  if (awaiting) return;
-  awaiting = true;
-  await cooltimePromise;
-  awaiting = false;
-  const $svg = $preview.querySelector("svg");
-  if ($svg) $svg.style.cssText = getStyleString(new FormData($color));
-  cooltimePromise = new Promise((r) => setTimeout(() => r(), 100));
-};
-$color.oninput = setColor;
-$reset.onclick = (e) => {
-  e.preventDefault();
-  $color.reset();
-  setColor();
-};
-
-const clamp = (n: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, n));
-const toRGB = (h = 138, s = 0.5, v = 1) => {
-  h = (h < 0 ? h % 360 + 360 : h) % 360 / 60;
-  s = s < 0 ? 0 : s > 1 ? 1 : s;
-  v = v < 0 ? 0 : v > 1 ? 1 : v;
-  const [r, g, b] = [5, 3, 1].map((n) =>
-    Math.round(
-      (v - clamp(2 - Math.abs(2 - (h + n) % 6), 0, 1) * s * v) * 255,
-    )
-  );
-  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, "0")}`;
-};
-$random.onclick = () => {
-  $color.hugecolor.value = toRGB(Math.random() * 360);
-  setColor();
-};
-
-const timestamp = () =>
-  new Date().toLocaleString("sv").replace(" ", "_").replaceAll(/[^\d_]/g, "");
-const download = (url: string, filebase: string, format: string) => {
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `${filebase}_${timestamp()}.${format}`;
-  a.click();
-  URL.revokeObjectURL(url);
-};
-
-$output.onsubmit = () => {
-  const filebase = "orbio";
-  const format = $output.format.value;
-  console.log({ format });
-  const svgText = new XMLSerializer().serializeToString(
-    $preview.querySelector("svg")!,
-  );
-  const svgBlob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
-  const svgUrl = URL.createObjectURL(svgBlob);
-  if (["png", "jpg", "webp"].includes(format)) {
-    const img = new Image();
-    img.onload = () => {
-      URL.revokeObjectURL(svgUrl);
-      const canvas = new OffscreenCanvas(512, 512);
-      const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(img, 0, 0, 512, 512);
-      canvas.convertToBlob({
-        type: `image/${format === "jpg" ? "jpeg" : format}`,
-      }).then((blob) => {
-        const imgUrl = URL.createObjectURL(blob);
-        download(imgUrl, filebase, format);
-      });
-    };
-    img.src = svgUrl;
-  } else {
-    download(svgUrl, filebase, format);
-  }
-  return false;
-};
-
-draw();
