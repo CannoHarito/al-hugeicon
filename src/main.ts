@@ -1,4 +1,4 @@
-import { getStyleString } from "./util.ts";
+import { getStyleString, getViewboxString, throttle } from "./util.ts";
 import { orbio } from "./orbio.ts";
 import { puge } from "./puge.ts";
 
@@ -7,6 +7,7 @@ declare const $parts: HTMLFormElement;
 declare const $color: HTMLFormElement;
 declare const $random: HTMLInputElement;
 declare const $output: HTMLFormElement;
+declare const $viewbox: HTMLFormElement;
 declare const $preview: HTMLElement;
 declare const $reset: HTMLInputElement;
 
@@ -15,6 +16,7 @@ const draw = () => {
   const options = {
     parts: [...new FormData($parts).keys()],
     color: new FormData($color),
+    viewbox: new FormData($viewbox),
   };
   $preview.insertAdjacentHTML(
     "beforeend",
@@ -23,17 +25,11 @@ const draw = () => {
 };
 $huge.onchange = draw;
 $parts.onchange = draw;
-let awaiting = false;
-let cooltimePromise = Promise.resolve();
-const setColor = async () => {
-  if (awaiting) return;
-  awaiting = true;
-  await cooltimePromise;
-  awaiting = false;
+
+const setColor = throttle(() => {
   const $svg = $preview.querySelector("svg");
   if ($svg) $svg.style.cssText = getStyleString(new FormData($color));
-  cooltimePromise = new Promise((r) => setTimeout(() => r(), 100));
-};
+});
 $color.oninput = setColor;
 $reset.onclick = (e) => {
   e.preventDefault();
@@ -59,6 +55,25 @@ $random.onclick = () => {
   setColor();
 };
 
+const setViewbox = throttle(() => {
+  $viewbox.querySelectorAll(`label:has([type="range"])`).forEach(($label) => {
+    const $span = $label.querySelector("span");
+    if ($span) {
+      $span.textContent = ("+" + $label.querySelector("input")?.value + "%")
+        .replace("+-", "-");
+    }
+  });
+  const $svg = $preview.querySelector("svg");
+  if ($svg) {
+    $svg.setAttributeNS(
+      null,
+      "viewBox",
+      getViewboxString(new FormData($viewbox)),
+    );
+  }
+});
+$viewbox.oninput = setViewbox;
+
 const timestamp = () =>
   new Date().toLocaleString("sv").replace(" ", "_").replaceAll(/[^\d_]/g, "");
 const download = (url: string, filebase: string, format: string) => {
@@ -72,19 +87,20 @@ const download = (url: string, filebase: string, format: string) => {
 $output.onsubmit = () => {
   const filebase = "orbio";
   const format = $output.format.value;
-  console.log({ format });
-  const svgText = new XMLSerializer().serializeToString(
-    $preview.querySelector("svg")!,
-  );
+  const $svg = $preview.querySelector("svg");
+  if (!$svg) throw new Error("svg not found");
+  const svgText = new XMLSerializer().serializeToString($svg);
   const svgBlob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
   const svgUrl = URL.createObjectURL(svgBlob);
   if (["png", "jpg", "webp"].includes(format)) {
     const img = new Image();
     img.onload = () => {
       URL.revokeObjectURL(svgUrl);
-      const canvas = new OffscreenCanvas(512, 512);
+      const size =
+        +($svg.getAttributeNS(null, "viewBox")?.match(/\d+$/)?.[0] || "512");
+      const canvas = new OffscreenCanvas(size, size);
       const ctx = canvas.getContext("2d")!;
-      ctx.drawImage(img, 0, 0, 512, 512);
+      ctx.drawImage(img, 0, 0, size, size);
       canvas.convertToBlob({
         type: `image/${format === "jpg" ? "jpeg" : format}`,
       }).then((blob) => {
@@ -99,4 +115,5 @@ $output.onsubmit = () => {
   return false;
 };
 
+setViewbox();
 draw();
