@@ -373,7 +373,7 @@ $output.onsubmit = () => {
     const img = new Image();
     img.onload = () => {
       URL.revokeObjectURL(svgUrl);
-      const size = +($svg.getAttributeNS(null, "viewBox")?.match(/\d+$/)?.[0] || "512");
+      const size = 512;
       const canvas = new OffscreenCanvas(size, size);
       const ctx = canvas.getContext("2d");
       ctx.drawImage(img, 0, 0, size, size);
