@@ -108,6 +108,18 @@ export function puge(
       );
     }
   }
+
+  // paint charmy
+  if (parts.includes("charmy")) {
+    defsChildren.push(`\
+<path id="charmyP" d="m-12 32c-18 0-32-14-32-32s14-32 32-32v20c-8 0-12 8-12 12s4 12 12 12h24c8 0 12-8 12-12s-4-12-12-12v-20c18 0 32 14 32 32s-14 32-32 32h-24"/>`);
+    svgChildren.push(`\
+<g stroke="${strokecolor}" stroke-linejoin="round" stroke-width="4">
+  <use href="#charmyP" transform="translate(96,-138) rotate(20)" fill="#24459b"/>
+  <use href="#charmyP" transform="translate(-96,-138) rotate(-20)" fill="#24459b"/>
+  <path d="m-136 0c0 63 44 120 112 120v16c-80 0-128-61-128-136s48-136 128-136h48c80 0 128 61 128 136s-48 136-128 136v-16c68 0 112-57 112-120s-44-120-112-120h-48c-68 0-112 57-112 120z" fill="#5ac3dc"/>
+</g>`);
+  }
   // paint mask
   if (parts.includes("mask")) {
     svgChildren.push(`\
