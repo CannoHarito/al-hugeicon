@@ -1,11 +1,15 @@
-import { DrawOptions, getStyleString } from "./util.ts";
+import { DrawOptions, getStyleString, getViewboxString } from "./util.ts";
 
 export function orbio({
   parts = ["hoshia", "tunoa", "tunob", "tunoc", "tunod", "ashia", "ashib"],
   color,
+  viewbox,
   style,
 }: Partial<DrawOptions> = {}): string {
   const svgStyle = color ? getStyleString(color) : "";
+  const viewboxString = viewbox
+    ? getViewboxString(viewbox)
+    : "-256 -256 512 512";
   const bodycolor = "var(--bodycolor, #ccc)",
     strokecolor = "var(--strokecolor, #323232)",
     hugecolor = "var(--hugecolor, #80ffa6)",
@@ -141,7 +145,7 @@ export function orbio({
   }
 
   return [
-    `<svg viewBox="-256 -256 512 512" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
+    `<svg viewBox="${viewboxString}" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
     ...(style ? [`<style>`, style, `</style>`] : []),
     `<defs>`,
     ...defsChildren,

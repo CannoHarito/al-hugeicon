@@ -1,4 +1,17 @@
 // src/util.ts
+var throttle = (func, timeout = 100) => {
+  let awaiting = false;
+  let cooltimePromise = Promise.resolve();
+  return async () => {
+    if (awaiting)
+      return;
+    awaiting = true;
+    await cooltimePromise;
+    awaiting = false;
+    func();
+    cooltimePromise = new Promise((r) => setTimeout(() => r(), timeout));
+  };
+};
 var colorNames = [
   "bgcolor",
   "bodycolor",
@@ -14,14 +27,24 @@ function getStyleString(formdata) {
   }
   return styles.join("");
 }
+function getViewboxString(formdata, { svgSize = 512 } = {}) {
+  const w = Math.round((+(formdata.get("size") || "0") + 100) * svgSize / 100);
+  const cx = Math.round(+(formdata.get("x") || "0") * svgSize / 100);
+  const cy = Math.round(+(formdata.get("y") || "0") * svgSize / 100);
+  const x = Math.round(cx - w / 2);
+  const y = Math.round(cy - w / 2);
+  return [x, y, w, w].join(" ");
+}
 
 // src/orbio.ts
 function orbio({
   parts = ["hoshia", "tunoa", "tunob", "tunoc", "tunod", "ashia", "ashib"],
   color,
+  viewbox,
   style
 } = {}) {
   const svgStyle = color ? getStyleString(color) : "";
+  const viewboxString = viewbox ? getViewboxString(viewbox) : "-256 -256 512 512";
   const bodycolor = "var(--bodycolor, #ccc)", strokecolor = "var(--strokecolor, #323232)", hugecolor = "var(--hugecolor, #80ffa6)", blackcolor = "var(--blackcolor, #323232)", greycolor = "var(--greycolor, #6e6e6e)";
   const svgChildren = [];
   const defsChildren = [];
@@ -139,7 +162,7 @@ function orbio({
     );
   }
   return [
-    `<svg viewBox="-256 -256 512 512" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
+    `<svg viewBox="${viewboxString}" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
     ...style ? [`<style>`, style, `</style>`] : [],
     `<defs>`,
     ...defsChildren,
@@ -150,8 +173,9 @@ function orbio({
 }
 
 // src/puge.ts
-function puge({ parts = [], color, style }) {
+function puge({ parts = [], color, viewbox, style }) {
   const svgStyle = color ? getStyleString(color) : "";
+  const viewboxString = viewbox ? getViewboxString(viewbox) : "-256 -256 512 512";
   const bodycolor = "var(--bodycolor, #ccc)", strokecolor = "var(--strokecolor, #323232)", hugecolor = "var(--hugecolor, #80ffa6)", blackcolor = "var(--blackcolor, #323232)", greycolor = "var(--greycolor, #6e6e6e)";
   const svgChildren = [];
   const defsChildren = [];
@@ -251,7 +275,7 @@ function puge({ parts = [], color, style }) {
 `);
   }
   return [
-    `<svg viewBox="-256 -256 512 512" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
+    `<svg viewBox="${viewboxString}" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
     ...style ? [`<style>`, style, `</style>`] : [],
     `<defs>`,
     ...defsChildren,
@@ -266,7 +290,8 @@ var draw = () => {
   $preview.innerText = "";
   const options = {
     parts: [...new FormData($parts).keys()],
-    color: new FormData($color)
+    color: new FormData($color),
+    viewbox: new FormData($viewbox)
   };
   $preview.insertAdjacentHTML(
     "beforeend",
@@ -275,19 +300,11 @@ var draw = () => {
 };
 $huge.onchange = draw;
 $parts.onchange = draw;
-var awaiting = false;
-var cooltimePromise = Promise.resolve();
-var setColor = async () => {
-  if (awaiting)
-    return;
-  awaiting = true;
-  await cooltimePromise;
-  awaiting = false;
+var setColor = throttle(() => {
   const $svg = $preview.querySelector("svg");
   if ($svg)
     $svg.style.cssText = getStyleString(new FormData($color));
-  cooltimePromise = new Promise((r) => setTimeout(() => r(), 100));
-};
+});
 $color.oninput = setColor;
 $reset.onclick = (e) => {
   e.preventDefault();
@@ -310,6 +327,23 @@ $random.onclick = () => {
   $color.hugecolor.value = toRGB(Math.random() * 360);
   setColor();
 };
+var setViewbox = throttle(() => {
+  $viewbox.querySelectorAll(`label:has([type="range"])`).forEach(($label) => {
+    const $span = $label.querySelector("span");
+    if ($span) {
+      $span.textContent = ("+" + $label.querySelector("input")?.value + "%").replace("+-", "-");
+    }
+  });
+  const $svg = $preview.querySelector("svg");
+  if ($svg) {
+    $svg.setAttributeNS(
+      null,
+      "viewBox",
+      getViewboxString(new FormData($viewbox))
+    );
+  }
+});
+$viewbox.oninput = setViewbox;
 var timestamp = () => (/* @__PURE__ */ new Date()).toLocaleString("sv").replace(" ", "_").replaceAll(/[^\d_]/g, "");
 var download = (url, filebase, format) => {
   const a = document.createElement("a");
@@ -321,19 +355,20 @@ var download = (url, filebase, format) => {
 $output.onsubmit = () => {
   const filebase = "orbio";
   const format = $output.format.value;
-  console.log({ format });
-  const svgText = new XMLSerializer().serializeToString(
-    $preview.querySelector("svg")
-  );
+  const $svg = $preview.querySelector("svg");
+  if (!$svg)
+    throw new Error("svg not found");
+  const svgText = new XMLSerializer().serializeToString($svg);
   const svgBlob = new Blob([svgText], { type: "image/svg+xml;charset=utf-8" });
   const svgUrl = URL.createObjectURL(svgBlob);
   if (["png", "jpg", "webp"].includes(format)) {
     const img = new Image();
     img.onload = () => {
       URL.revokeObjectURL(svgUrl);
-      const canvas = new OffscreenCanvas(512, 512);
+      const size = +($svg.getAttributeNS(null, "viewBox")?.match(/\d+$/)?.[0] || "512");
+      const canvas = new OffscreenCanvas(size, size);
       const ctx = canvas.getContext("2d");
-      ctx.drawImage(img, 0, 0, 512, 512);
+      ctx.drawImage(img, 0, 0, size, size);
       canvas.convertToBlob({
         type: `image/${format === "jpg" ? "jpeg" : format}`
       }).then((blob) => {
@@ -347,4 +382,5 @@ $output.onsubmit = () => {
   }
   return false;
 };
+setViewbox();
 draw();

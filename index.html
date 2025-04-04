@@ -122,6 +122,30 @@
       </fieldset>
       <input id="$reset" type="reset" value="デフォルトに戻す">
     </form>
+    <form name="viewbox" id="$viewbox">
+      <h4>ViewBox調整</h4>
+      <label>サイズ: <span></span><input
+          type="range"
+          name="size"
+          min="-50"
+          max="50"
+          value="0"
+        /></label>
+      <label>中心X: <span></span><input
+          type="range"
+          name="x"
+          min="-50"
+          max="50"
+          value="0"
+        /></label>
+      <label>中心Y: <span></span><input
+          type="range"
+          name="y"
+          min="-50"
+          max="50"
+          value="0"
+        /></label>
+    </form>
   </div>
   <article>
     <div id="$preview"></div>
