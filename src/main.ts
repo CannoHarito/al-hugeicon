@@ -59,7 +59,7 @@ const setViewbox = throttle(() => {
   $viewbox.querySelectorAll(`label:has([type="range"])`).forEach(($label) => {
     const $span = $label.querySelector("span");
     if ($span) {
-      $span.textContent = ("+" + $label.querySelector("input")?.value + "%")
+      $span.innerText = ("+" + $label.querySelector("input")?.value + "%")
         .replace("+-", "-");
     }
   });

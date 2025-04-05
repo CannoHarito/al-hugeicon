@@ -143,6 +143,19 @@ export function orbio({
       `<use transform="translate(-76,-96) rotate(-28)" href="#drill"/>`,
     );
   }
+  if (parts.includes("yunicap")) {
+    svgChildren.push(`\
+<g fill-rule="evenodd" stroke="#13258a" stroke-linejoin="round">
+  <path d="m132-108c-1 11 0 18-16 22-30 11-100-28-116-28s-68 8-111 10c-12-5-20-18-10-40 8-16 64-41 119-36 62 2 136 50 134 72z" fill="#fff" stroke-width="4"/>
+  <path d="m-114-105 12-1c26-2 28-9 78-16s115 39 143 36v10c-25 6-93-39-143-33s-48 15-78 17l-12 1z" fill="#f6cc74" stroke-width="6"/>
+  <g transform="translate(0,2.4)" fill="#f6cc74" stroke-linecap="round" stroke-width="2">
+    <path d="m109-86c21 38 28 72 32 111l-5 6c-5-39-9-79-34-117"/>
+    <path d="m102-86c-14 40-16 77-15 116l7 4c-3-39-3-78 15-120"/>
+    <path d="m102-86c9 13 10 36 7 43s-16 4-24-6c-7-10 16-31 16-31m10 39c0 10-22 8-32-6s22-41 22-41"/>
+    <path d="m105-88c1 16 8 43 11 48 4 6 25 7 29-4s-39-38-39-38m-5-6c0 18 8 45 12 52 4 8 32 8 37-7 6-15-45-45-45-45"/>
+  </g>
+</g>`);
+  }
 
   return [
     `<svg viewBox="${viewboxString}" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
