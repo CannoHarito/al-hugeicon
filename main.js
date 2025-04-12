@@ -173,6 +173,19 @@ function orbio({
   </g>
 </g>`);
   }
+  if (parts.includes("dainsleif")) {
+    svgChildren.push(`<g stroke="${strokecolor}" stroke-linejoin="round" stroke-linecap="round" stroke-width="2" transform="translate(76,-124) rotate(32)">
+  <path d="m4-32v-56h-8v56zm0 24 4 4 22-22 4-2 2-6-2-2-6 2-2 4z" fill="${greycolor}"/>
+  <path d="m-12-32-12 40 2 8h14l4 32h8l4-32h14l2-8h-16v-40zm16-56 3-4-5-11h-4l-5 11 3 4z" fill="${greycolor}"/>
+  <path d="m25 0 27 4-4 40-24 16-4 8c-14 2-26 2-40 0l-4-8-24-16-4-40 27-4 9 8 4 12-4 2 7 26h4l5 4 4-4h5l7-26-4-2 4-12 9-8" fill="#a9a071"/>
+  <circle r="14" stroke-width="7"/>
+  <circle r="14" stroke="${greycolor}" fill="#76fbff" stroke-width="3"/>
+  <path d="m7-8-7 4-7-4v16l7-4 7 4m-7-16v16" stroke="${greycolor}" stroke-width="3.8" fill="none"/>
+  <path d="m7-8-7 4-7-4v16l7-4 7 4m-7-16v16" stroke="#fff" stroke-width="3" fill="none"/>
+  <path d="m0 52 4 10-4 7m-5-90c0 2-1 3-3 3s-3-1-3-3 1-3 3-3 3 1 3 3zm29 64c0 2 1 3 3 3s3-1 3-3-1-3-3-3-3 1-3 3zm7-41s-2 23-1 23 8-22 8-22m-62 40c0 2-1 3-3 3s-3-1-3-3 1-3 3-3 3 1 3 3zm-7-41s2 23 1 23-8-22-8-22" fill="none"/>
+  <path d="m-21 71-6 4-6-1-7 5m60-8 12 4h7l7 4m-69-11h-7l-5-3-9 1m69 2 8-2 8 1 5-2" fill="none"/>
+</g>`);
+  }
   return [
     `<svg viewBox="${viewboxString}" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
     ...style ? [`<style>`, style, `</style>`] : [],
