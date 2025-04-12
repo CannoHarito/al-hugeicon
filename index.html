@@ -94,6 +94,13 @@
         <input type="button" id="$random" value="ランダム">
       </fieldset>
     </form>
+    <form name="colorpicker" id="$colorpicker">
+      <output name="rgb"></output>
+      <div class="palette"><div class="thumb"></div></div>
+      <output name="saturation"></output>
+      <output name="brightness"></output>
+      <input type="range" name="hue" min="0" max="360">
+    </form>
     <form name="viewbox" id="$viewbox">
       <h4>ViewBox</h4>
       <label>サイズ: <span></span>
@@ -144,4 +151,46 @@
     </p>
   </small>
 </footer>
+<style>
+  [id="$colorpicker"] {
+    --thumb-size: 24px;
+    .palette {
+      margin: var(--thumb-size);
+      position: relative;
+      width: 200px;
+      height: 200px;
+      background-color: hsl(var(--picked-hue, 0) 100% 50%);
+      background-image:
+        linear-gradient(to top, #000, #0000),
+        linear-gradient(to left, #fff0, #fff);
+    }
+    .thumb {
+      position: absolute;
+      width: var(--thumb-size);
+      height: var(--thumb-size);
+      border: solid 2px #fff;
+      border-radius: 12px;
+      background: transparent;
+      transform: translate(
+        calc(var(--thumb-size) * -0.5),
+        calc(var(--thumb-size) * -0.5)
+      );
+    }
+    [name="hue"] {
+      --pico-range-border-color: transparent;
+      --pico-range-thumb-color: transparent;
+      --pico-range-thumb-active-color: transparent;
+      background: linear-gradient(
+        to right,
+        hsl(0deg 100% 50%),
+        hsl(60deg 100% 50%),
+        hsl(120deg 100% 50%),
+        hsl(180deg 100% 50%),
+        hsl(240deg 100% 50%),
+        hsl(300deg 100% 50%),
+        hsl(360deg 100% 50%)
+      );
+    }
+  }
+</style>
 <script type="module" src="./main.js"></script>

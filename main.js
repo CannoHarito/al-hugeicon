@@ -35,6 +35,22 @@ function getViewboxString(formdata, { svgSize = 512 } = {}) {
   const y = Math.round(cy - w / 2);
   return [x, y, w, w].join(" ");
 }
+var clamp = (n, min, max) => Math.min(max, Math.max(min, n));
+var toRGB = (h = 138, s = 0.5, v = 1) => {
+  h = (h < 0 ? h % 360 + 360 : h) % 360 / 60;
+  s = clamp(s, 0, 1);
+  v = clamp(v, 0, 1);
+  const [r, g, b] = [5, 3, 1].map(
+    (n) => Math.round(
+      (v - clamp(2 - Math.abs(2 - (h + n) % 6), 0, 1) * s * v) * 255
+    )
+  );
+  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, "0")}`;
+};
+var toHSV = (rgb = "#80ffa6") => {
+  const rgbNum = parseInt(rgb.replaceAll(/[^a-f\d]/ig, ""), 16), [r, g, b] = [16, 8, 0].map((n) => rgbNum >> n & 255), max = Math.max(r, g, b), diff = max - Math.min(r, g, b), i = [r, g, b].indexOf(max), [a1, a2] = [r, g, b, r, g].slice(i + 1), v = max / 255, s = max ? diff / max : 0, h = s ? ((a1 - a2) / diff * 60 + 120 * i + 360) % 360 : 0;
+  return { h, s, v };
+};
 
 // src/orbio.ts
 var name = "orbio";
@@ -334,6 +350,74 @@ var draw2 = ({ parts: parts3 = [], color, viewbox, style }) => {
 };
 var puge = { name: name2, parts: parts2, draw: draw2 };
 
+// src/colorpicker.ts
+var initColorPicker = (dom) => {
+  const $palette = dom.querySelector(".palette");
+  const $thumb = dom.querySelector(".thumb");
+  const $hue = dom.querySelector(`input[name="hue"]`);
+  const $saturation = dom.querySelector(
+    `[name="saturation"]`
+  );
+  const $brightness = dom.querySelector(
+    `[name="brightness"]`
+  );
+  if (!$palette || !$thumb || !$hue || !$saturation || !$brightness) {
+    throw new Error("dom is not ColorPicker");
+  }
+  let target;
+  const state = { h: 138, s: 0.5, v: 1 };
+  const setTarget = ($input) => {
+    target = $input;
+    setHSV(toHSV(target.value));
+  };
+  const setHSV = ({ h, s, v }, needsRGB = false) => {
+    if (h != void 0 && h != state.h) {
+      state.h = h;
+      $hue.valueAsNumber = h;
+      dom.style.setProperty("--picked-hue", "" + h);
+      needsRGB = true;
+    }
+    if (s != void 0 && s != state.s) {
+      state.s = s;
+      $thumb.style.setProperty("left", `${100 * s}%`);
+      needsRGB = true;
+    }
+    if (v != void 0 && v != state.v) {
+      state.v = v;
+      $thumb.style.setProperty("top", `${100 - 100 * v}%`);
+      needsRGB = true;
+    }
+    if (target && needsRGB) {
+      target.value = toRGB(...Object.values(state));
+      target.dispatchEvent(
+        new InputEvent("input", { bubbles: true, cancelable: true })
+      );
+    }
+  };
+  const { width: paletteWidth, height: paletteHeight } = $palette.getBoundingClientRect();
+  $hue.oninput = () => {
+    setHSV({ h: $hue.valueAsNumber });
+  };
+  const handlePointerMove = (e) => {
+    if (e.buttons == 1) {
+      $palette.setPointerCapture(e.pointerId);
+      const top = clamp(e.offsetY, 0, paletteHeight);
+      const left = clamp(e.offsetX, 0, paletteWidth);
+      setHSV({ s: left / paletteWidth, v: 1 - top / paletteHeight });
+    }
+  };
+  $palette.onpointermove = handlePointerMove;
+  $palette.onpointerdown = handlePointerMove;
+  document.querySelectorAll(`input[type="color"]`).forEach(
+    ($input) => $input.addEventListener("click", (e) => {
+      if ($input.disabled || !$input.name)
+        return;
+      e.preventDefault();
+      setTarget($input);
+    })
+  );
+};
+
 // src/main.ts
 var huges = [orbio, puge];
 var huge = huges[0];
@@ -370,18 +454,6 @@ $reset.onclick = (e) => {
   e.preventDefault();
   $color.reset();
   setColor();
-};
-var clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-var toRGB = (h = 138, s = 0.5, v = 1) => {
-  h = (h < 0 ? h % 360 + 360 : h) % 360 / 60;
-  s = s < 0 ? 0 : s > 1 ? 1 : s;
-  v = v < 0 ? 0 : v > 1 ? 1 : v;
-  const [r, g, b] = [5, 3, 1].map(
-    (n) => Math.round(
-      (v - clamp(2 - Math.abs(2 - (h + n) % 6), 0, 1) * s * v) * 255
-    )
-  );
-  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, "0")}`;
 };
 $random.onclick = () => {
   $color.hugecolor.value = toRGB(Math.random() * 360);
@@ -445,3 +517,4 @@ $output.onsubmit = () => {
 setHuge();
 setViewbox();
 setSVG();
+initColorPicker($colorpicker);

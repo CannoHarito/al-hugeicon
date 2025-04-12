@@ -1,6 +1,13 @@
-import { getStyleString, getViewboxString, Huge, throttle } from "./util.ts";
+import {
+  getStyleString,
+  getViewboxString,
+  Huge,
+  throttle,
+  toRGB,
+} from "./util.ts";
 import { orbio } from "./orbio.ts";
 import { puge } from "./puge.ts";
+import { initColorPicker } from "./colorpicker.ts";
 
 declare const $huge: HTMLFormElement;
 declare const $parts: HTMLFormElement;
@@ -50,19 +57,6 @@ $reset.onclick = (e) => {
   setColor();
 };
 
-const clamp = (n: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, n));
-const toRGB = (h = 138, s = 0.5, v = 1) => {
-  h = (h < 0 ? h % 360 + 360 : h) % 360 / 60;
-  s = s < 0 ? 0 : s > 1 ? 1 : s;
-  v = v < 0 ? 0 : v > 1 ? 1 : v;
-  const [r, g, b] = [5, 3, 1].map((n) =>
-    Math.round(
-      (v - clamp(2 - Math.abs(2 - (h + n) % 6), 0, 1) * s * v) * 255,
-    )
-  );
-  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, "0")}`;
-};
 $random.onclick = () => {
   $color.hugecolor.value = toRGB(Math.random() * 360);
   setColor();
@@ -130,3 +124,4 @@ $output.onsubmit = () => {
 setHuge();
 setViewbox();
 setSVG();
+initColorPicker($colorpicker);
