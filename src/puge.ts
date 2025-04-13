@@ -1,8 +1,15 @@
-import { DrawOptions, getStyleString, getViewboxString } from "./util.ts";
+import { getStyleString, getViewboxString, Huge } from "./util.ts";
 
-export function puge(
-  { parts = [], color, viewbox, style }: Partial<DrawOptions>,
-) {
+const name = "puge";
+const parts = [
+  ["hearta", "sumi"],
+  ["drilla", "drillb"],
+  ["ashia", "ashib"],
+  ["mask", "charmy"],
+].flat();
+const draw: Huge["draw"] = (
+  { parts = [], color, viewbox, style },
+) => {
   const svgStyle = color ? getStyleString(color) : "";
   const viewboxString = viewbox
     ? getViewboxString(viewbox)
@@ -150,4 +157,6 @@ export function puge(
     ...svgChildren,
     `</svg>`,
   ].join("\n");
-}
+};
+
+export const puge: Huge = { name, parts, draw };

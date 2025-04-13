@@ -1,11 +1,18 @@
-import { DrawOptions, getStyleString, getViewboxString } from "./util.ts";
+import { getStyleString, getViewboxString, Huge } from "./util.ts";
 
-export function orbio({
+const name = "orbio";
+const parts = [
+  ["hoshia", "hoshib", "hearta", "sumi"],
+  ["tunoa", "tunob", "tunoc", "tunod", "drilla", "drillb"],
+  ["ashia", "ashib"],
+  ["yunicap", "dainsleif"],
+].flat();
+const draw: Huge["draw"] = ({
   parts = ["hoshia", "tunoa", "tunob", "tunoc", "tunod", "ashia", "ashib"],
   color,
   viewbox,
   style,
-}: Partial<DrawOptions> = {}): string {
+} = {}) => {
   const svgStyle = color ? getStyleString(color) : "";
   const viewboxString = viewbox
     ? getViewboxString(viewbox)
@@ -179,4 +186,6 @@ export function orbio({
     ...svgChildren,
     `</svg>`,
   ].join("\n");
-}
+};
+
+export const orbio: Huge = { name, parts, draw };

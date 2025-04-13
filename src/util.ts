@@ -10,6 +10,11 @@ export const throttle = (func: () => void, timeout = 100) => {
     cooltimePromise = new Promise((r) => setTimeout(() => r(), timeout));
   };
 };
+export interface Huge {
+  name: string;
+  draw: (options: Partial<DrawOptions>) => string;
+  parts: string[];
+}
 export interface DrawOptions {
   parts: string[];
   color: FormData;

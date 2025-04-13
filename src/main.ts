@@ -1,4 +1,4 @@
-import { getStyleString, getViewboxString, throttle } from "./util.ts";
+import { getStyleString, getViewboxString, Huge, throttle } from "./util.ts";
 import { orbio } from "./orbio.ts";
 import { puge } from "./puge.ts";
 
@@ -11,7 +11,10 @@ declare const $viewbox: HTMLFormElement;
 declare const $preview: HTMLElement;
 declare const $reset: HTMLInputElement;
 
-const draw = () => {
+const huges: Huge[] = [orbio, puge];
+let huge = huges[0];
+
+const setSVG = () => {
   $preview.innerText = "";
   const options = {
     parts: [...new FormData($parts).keys()],
@@ -20,11 +23,21 @@ const draw = () => {
   };
   $preview.insertAdjacentHTML(
     "beforeend",
-    $huge.base.value == "puge" ? puge(options) : orbio(options),
+    huge.draw(options),
   );
 };
-$huge.onchange = draw;
-$parts.onchange = draw;
+const isInput = (e: Element): e is HTMLInputElement =>
+  "INPUT" === e?.tagName.toUpperCase() && !!(e as HTMLInputElement).name;
+const $partsInputs = [...$parts.elements].filter(isInput);
+const setHuge = () => {
+  huge = huges.find((h) => h.name == $huge.base.value) ?? huges[0];
+  $partsInputs.forEach(($el) => $el.disabled = !huge.parts.includes($el.name));
+};
+$huge.onchange = () => {
+  setHuge();
+  setSVG();
+};
+$parts.onchange = setSVG;
 
 const setColor = throttle(() => {
   const $svg = $preview.querySelector("svg");
@@ -114,5 +127,6 @@ $output.onsubmit = () => {
   return false;
 };
 
+setHuge();
 setViewbox();
-draw();
+setSVG();
