@@ -7,7 +7,7 @@ import {
 } from "./util.ts";
 import { orbio } from "./orbio.ts";
 import { puge } from "./puge.ts";
-import { initColorPicker } from "./colorpicker.ts";
+import { initColorPicker, setPicker } from "./colorpicker.ts";
 
 declare const $huge: HTMLFormElement;
 declare const $parts: HTMLFormElement;
@@ -55,11 +55,13 @@ $reset.onclick = (e) => {
   e.preventDefault();
   $color.reset();
   setColor();
+  setPicker();
 };
 
 $random.onclick = () => {
   $color.hugecolor.value = toRGB(Math.random() * 360);
   setColor();
+  setPicker();
 };
 
 const setViewbox = throttle(() => {
@@ -124,4 +126,7 @@ $output.onsubmit = () => {
 setHuge();
 setViewbox();
 setSVG();
-initColorPicker($colorpicker);
+const $colorInputs = [...$color.elements].filter(isInput).filter((el) =>
+  el.type === "color"
+);
+initColorPicker($colorInputs);
