@@ -46,3 +46,33 @@ export function getViewboxString(formdata: FormData, { svgSize = 512 } = {}) {
   const y = Math.round(cy - w / 2);
   return [x, y, w, w].join(" ");
 }
+export const clamp = (n: number, min = 0, max = 1) =>
+  Math.min(max, Math.max(min, n));
+export const toRGB = ({ h = 360, s = 0.5, v = 1 }: Partial<HSV> = {}) => {
+  h = (h < 0 ? h % 360 + 360 : h) % 360 / 60;
+  s = clamp(s, 0, 1);
+  v = clamp(v, 0, 1);
+  const [r, g, b] = [5, 3, 1].map((n) =>
+    Math.round(
+      (v - clamp(2 - Math.abs(2 - (h + n) % 6), 0, 1) * s * v) * 255,
+    )
+  );
+  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, "0")}`;
+};
+export interface HSV {
+  h: number;
+  s: number;
+  v: number;
+}
+export const toHSV = (rgb: string = "#ff8080"): HSV => {
+  const rgbNum = parseInt(rgb.replaceAll(/[^a-f\d]/ig, ""), 16),
+    [r, g, b] = [16, 8, 0].map((n) => rgbNum >> n & 0xff),
+    max = Math.max(r, g, b),
+    diff = max - Math.min(r, g, b),
+    i = [r, g, b].indexOf(max),
+    [a1, a2] = [r, g, b, r, g].slice(i + 1),
+    v = max / 255,
+    s = max ? diff / max : 0,
+    h = s ? ((a1 - a2) / diff * 60 + 120 * i + 360) % 360 : 0;
+  return { h, s, v };
+};

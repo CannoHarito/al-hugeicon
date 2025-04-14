@@ -35,6 +35,22 @@ function getViewboxString(formdata, { svgSize = 512 } = {}) {
   const y = Math.round(cy - w / 2);
   return [x, y, w, w].join(" ");
 }
+var clamp = (n, min = 0, max = 1) => Math.min(max, Math.max(min, n));
+var toRGB = ({ h = 360, s = 0.5, v = 1 } = {}) => {
+  h = (h < 0 ? h % 360 + 360 : h) % 360 / 60;
+  s = clamp(s, 0, 1);
+  v = clamp(v, 0, 1);
+  const [r, g, b] = [5, 3, 1].map(
+    (n) => Math.round(
+      (v - clamp(2 - Math.abs(2 - (h + n) % 6), 0, 1) * s * v) * 255
+    )
+  );
+  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, "0")}`;
+};
+var toHSV = (rgb = "#ff8080") => {
+  const rgbNum = parseInt(rgb.replaceAll(/[^a-f\d]/ig, ""), 16), [r, g, b] = [16, 8, 0].map((n) => rgbNum >> n & 255), max = Math.max(r, g, b), diff = max - Math.min(r, g, b), i = [r, g, b].indexOf(max), [a1, a2] = [r, g, b, r, g].slice(i + 1), v = max / 255, s = max ? diff / max : 0, h = s ? ((a1 - a2) / diff * 60 + 120 * i + 360) % 360 : 0;
+  return { h, s, v };
+};
 
 // src/orbio.ts
 var name = "orbio";
@@ -334,6 +350,71 @@ var draw2 = ({ parts: parts3 = [], color, viewbox, style }) => {
 };
 var puge = { name: name2, parts: parts2, draw: draw2 };
 
+// src/colorpicker.ts
+var inputType = "inputfrompicker";
+var target;
+var state = { h: 138, s: 0.5, v: 1 };
+var setPicker = ($input) => {
+  if ($input)
+    target = $input;
+  setHSV(toHSV(target.value));
+  target?.insertAdjacentElement("afterend", $colorpicker);
+};
+var setHSV = ({ h, s, v }, needsRGB = false) => {
+  if (h != void 0 && h != state.h) {
+    state.h = h;
+    $colorH.valueAsNumber = h;
+    $colorpicker.style.setProperty("--picked-hue", h.toString());
+    needsRGB = needsRGB || !!(s ?? state.s);
+  }
+  if (s != void 0 && s != state.s) {
+    state.s = s;
+    $colorSV.style.setProperty("left", `${100 * s}%`);
+    needsRGB = true;
+  }
+  if (v != void 0 && v != state.v) {
+    state.v = v;
+    $colorSV.style.setProperty("top", `${100 - 100 * v}%`);
+    needsRGB = true;
+  }
+  if (target && needsRGB) {
+    target.value = toRGB(state);
+    target.dispatchEvent(
+      new InputEvent("input", { bubbles: true, cancelable: true, inputType })
+    );
+  }
+};
+var handlePointerMove = (e) => {
+  if (e.target == e.currentTarget && e.buttons == 1) {
+    $colorpallet.setPointerCapture(e.pointerId);
+    const { width, height } = $colorpallet.getBoundingClientRect();
+    const v = clamp(1 - e.offsetY / height, 0, 1);
+    const s = clamp(e.offsetX / width, 0, 1);
+    setHSV({ s, v });
+  }
+};
+var initColorPicker = (inputs, { initTarget = inputs.at(-1) } = {}) => {
+  $colorH.oninput = () => {
+    setHSV({ h: $colorH.valueAsNumber });
+  };
+  $colorpallet.onpointermove = handlePointerMove;
+  $colorpallet.onpointerdown = handlePointerMove;
+  inputs.forEach(($input) => {
+    $input.addEventListener("click", (e) => {
+      if ($input == target || $input.disabled || !$input.name)
+        return;
+      e.preventDefault();
+      setPicker($input);
+    });
+    $input.addEventListener("input", (e) => {
+      if (inputType != e.inputType && $input == target) {
+        setHSV(toHSV(target.value));
+      }
+    });
+  });
+  setPicker(initTarget);
+};
+
 // src/main.ts
 var huges = [orbio, puge];
 var huge = huges[0];
@@ -370,22 +451,12 @@ $reset.onclick = (e) => {
   e.preventDefault();
   $color.reset();
   setColor();
-};
-var clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-var toRGB = (h = 138, s = 0.5, v = 1) => {
-  h = (h < 0 ? h % 360 + 360 : h) % 360 / 60;
-  s = s < 0 ? 0 : s > 1 ? 1 : s;
-  v = v < 0 ? 0 : v > 1 ? 1 : v;
-  const [r, g, b] = [5, 3, 1].map(
-    (n) => Math.round(
-      (v - clamp(2 - Math.abs(2 - (h + n) % 6), 0, 1) * s * v) * 255
-    )
-  );
-  return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, "0")}`;
+  setPicker();
 };
 $random.onclick = () => {
-  $color.hugecolor.value = toRGB(Math.random() * 360);
+  $color.hugecolor.value = toRGB({ h: Math.random() * 360, s: 0.5, v: 1 });
   setColor();
+  setPicker();
 };
 var setViewbox = throttle(() => {
   $viewbox.querySelectorAll(`label:has([type="range"])`).forEach(($label) => {
@@ -445,3 +516,7 @@ $output.onsubmit = () => {
 setHuge();
 setViewbox();
 setSVG();
+var $colorInputs = [...$color.elements].filter(isInput).filter(
+  (el) => el.type === "color"
+);
+initColorPicker($colorInputs);

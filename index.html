@@ -44,6 +44,47 @@
   label:has(input:disabled) {
     display: none;
   }
+  input[type="range"] {
+    touch-action: pinch-zoom;
+  }
+  [id="$colorpicker"] {
+    --thumb-size: 24px;
+    [id="$colorpallet"] {
+      margin: 0 auto var(--thumb-size);
+      position: relative;
+      aspect-ratio: 2/1;
+      max-width: 400px;
+      background-color: hsl(var(--picked-hue, 0) 100% 50%);
+      background-image:
+        linear-gradient(to top, #000, #0000),
+        linear-gradient(to left, #fff0, #fff);
+      touch-action: pinch-zoom;
+    }
+    [id="$colorSV"] {
+      position: absolute;
+      width: var(--thumb-size);
+      height: var(--thumb-size);
+      border: solid 2px #fff;
+      border-radius: 12px;
+      background: transparent;
+      transform: translate(-50%, -50%);
+    }
+    [id="$colorH"] {
+      --pico-range-border-color: transparent;
+      --pico-range-thumb-color: transparent;
+      --pico-range-thumb-active-color: transparent;
+      background: linear-gradient(
+        to right,
+        hsl(0deg 100% 50%),
+        hsl(60deg 100% 50%),
+        hsl(120deg 100% 50%),
+        hsl(180deg 100% 50%),
+        hsl(240deg 100% 50%),
+        hsl(300deg 100% 50%),
+        hsl(360deg 100% 50%)
+      );
+    }
+  }
 </style>
 
 <header class="container">
@@ -82,6 +123,10 @@
     </form>
     <form name="color" id="$color">
       <h4>色</h4>
+      <fieldset role="group">
+        <input id="$reset" type="reset" value="デフォルトをセット">
+        <input type="button" id="$random" value="ランダム">
+      </fieldset>
       <label>
         <input type="checkbox" name="bgtransparent" role="switch">背景透明
       </label>
@@ -89,9 +134,9 @@
       <input type="color" name="bodycolor" value="#cccccc">
       <input type="color" name="strokecolor" value="#323232">
       <input type="color" name="hugecolor" value="#80ffa6">
-      <fieldset role="group">
-        <input id="$reset" type="reset" value="デフォルトに戻す">
-        <input type="button" id="$random" value="ランダム">
+      <fieldset id="$colorpicker">
+        <div id="$colorpallet"><div id="$colorSV"></div></div>
+        <input type="range" min="0" max="360" id="$colorH">
       </fieldset>
     </form>
     <form name="viewbox" id="$viewbox">
