@@ -59,7 +59,7 @@ $reset.onclick = (e) => {
 };
 
 $random.onclick = () => {
-  $color.hugecolor.value = toRGB(Math.random() * 360);
+  $color.hugecolor.value = toRGB({ h: Math.random() * 360, s: .5, v: 1 });
   setColor();
   setPicker();
 };

@@ -30,14 +30,14 @@ const setHSV = ({ h, s, v }: Partial<HSV>, needsRGB = false) => {
     needsRGB = true;
   }
   if (target && needsRGB) {
-    target.value = toRGB(...Object.values(state));
+    target.value = toRGB(state);
     target.dispatchEvent(
       new InputEvent("input", { bubbles: true, cancelable: true }),
     );
   }
 };
 const handlePointerMove = (e: PointerEvent) => {
-  if (e.buttons == 1) {
+  if (e.target == e.currentTarget && e.buttons == 1) {
     $colorpallet.setPointerCapture(e.pointerId);
     const { width, height } = $colorpallet.getBoundingClientRect();
     const v = clamp(1 - e.offsetY / height, 0, 1);

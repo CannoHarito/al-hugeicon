@@ -35,8 +35,8 @@ function getViewboxString(formdata, { svgSize = 512 } = {}) {
   const y = Math.round(cy - w / 2);
   return [x, y, w, w].join(" ");
 }
-var clamp = (n, min, max) => Math.min(max, Math.max(min, n));
-var toRGB = (h = 138, s = 0.5, v = 1) => {
+var clamp = (n, min = 0, max = 1) => Math.min(max, Math.max(min, n));
+var toRGB = ({ h = 360, s = 0.5, v = 1 } = {}) => {
   h = (h < 0 ? h % 360 + 360 : h) % 360 / 60;
   s = clamp(s, 0, 1);
   v = clamp(v, 0, 1);
@@ -47,7 +47,7 @@ var toRGB = (h = 138, s = 0.5, v = 1) => {
   );
   return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, "0")}`;
 };
-var toHSV = (rgb = "#80ffa6") => {
+var toHSV = (rgb = "#ff8080") => {
   const rgbNum = parseInt(rgb.replaceAll(/[^a-f\d]/ig, ""), 16), [r, g, b] = [16, 8, 0].map((n) => rgbNum >> n & 255), max = Math.max(r, g, b), diff = max - Math.min(r, g, b), i = [r, g, b].indexOf(max), [a1, a2] = [r, g, b, r, g].slice(i + 1), v = max / 255, s = max ? diff / max : 0, h = s ? ((a1 - a2) / diff * 60 + 120 * i + 360) % 360 : 0;
   return { h, s, v };
 };
@@ -377,14 +377,14 @@ var setHSV = ({ h, s, v }, needsRGB = false) => {
     needsRGB = true;
   }
   if (target && needsRGB) {
-    target.value = toRGB(...Object.values(state));
+    target.value = toRGB(state);
     target.dispatchEvent(
       new InputEvent("input", { bubbles: true, cancelable: true })
     );
   }
 };
 var handlePointerMove = (e) => {
-  if (e.buttons == 1) {
+  if (e.target == e.currentTarget && e.buttons == 1) {
     $colorpallet.setPointerCapture(e.pointerId);
     const { width, height } = $colorpallet.getBoundingClientRect();
     const v = clamp(1 - e.offsetY / height, 0, 1);
@@ -452,7 +452,7 @@ $reset.onclick = (e) => {
   setPicker();
 };
 $random.onclick = () => {
-  $color.hugecolor.value = toRGB(Math.random() * 360);
+  $color.hugecolor.value = toRGB({ h: Math.random() * 360, s: 0.5, v: 1 });
   setColor();
   setPicker();
 };

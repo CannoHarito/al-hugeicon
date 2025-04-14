@@ -46,9 +46,9 @@ export function getViewboxString(formdata: FormData, { svgSize = 512 } = {}) {
   const y = Math.round(cy - w / 2);
   return [x, y, w, w].join(" ");
 }
-export const clamp = (n: number, min: number, max: number) =>
+export const clamp = (n: number, min = 0, max = 1) =>
   Math.min(max, Math.max(min, n));
-export const toRGB = (h = 138, s = 0.5, v = 1) => {
+export const toRGB = ({ h = 360, s = 0.5, v = 1 }: Partial<HSV> = {}) => {
   h = (h < 0 ? h % 360 + 360 : h) % 360 / 60;
   s = clamp(s, 0, 1);
   v = clamp(v, 0, 1);
@@ -64,7 +64,7 @@ export interface HSV {
   s: number;
   v: number;
 }
-export const toHSV = (rgb = "#80ffa6"): HSV => {
+export const toHSV = (rgb: string = "#ff8080"): HSV => {
   const rgbNum = parseInt(rgb.replaceAll(/[^a-f\d]/ig, ""), 16),
     [r, g, b] = [16, 8, 0].map((n) => rgbNum >> n & 0xff),
     max = Math.max(r, g, b),
