@@ -12,6 +12,7 @@ import { initColorPicker, setPicker } from "./colorpicker.ts";
 declare const $huge: HTMLFormElement;
 declare const $parts: HTMLFormElement;
 declare const $color: HTMLFormElement;
+declare const $randommode: HTMLSelectElement;
 declare const $random: HTMLInputElement;
 declare const $output: HTMLFormElement;
 declare const $viewbox: HTMLFormElement;
@@ -59,7 +60,15 @@ $reset.onclick = (e) => {
 };
 
 $random.onclick = () => {
-  $color.hugecolor.value = toRGB({ h: Math.random() * 360, s: .5, v: 1 });
+  const hugeHue = Math.random() * 360;
+  const diff = +($randommode.value ?? "120");
+  $color.hugecolor.value = toRGB({ h: hugeHue, s: .5, v: 1 });
+  const hues = [hugeHue + diff, hugeHue - diff]
+    .toSorted(() => Math.random() - .5);
+  $color.bgcolor.value = toRGB({ h: hues[0], s: .2, v: 1 });
+  $color.bodycolor.value = toRGB({ h: hues[1], s: .3, v: .8 });
+  const strokeHue = (hugeHue + hues[1]) / 2;
+  $color.strokecolor.value = toRGB({ h: strokeHue, s: .4, v: .3 });
   setColor();
   setPicker();
 };

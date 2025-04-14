@@ -454,7 +454,14 @@ $reset.onclick = (e) => {
   setPicker();
 };
 $random.onclick = () => {
-  $color.hugecolor.value = toRGB({ h: Math.random() * 360, s: 0.5, v: 1 });
+  const hugeHue = Math.random() * 360;
+  const diff = +($randommode.value ?? "120");
+  $color.hugecolor.value = toRGB({ h: hugeHue, s: 0.5, v: 1 });
+  const hues = [hugeHue + diff, hugeHue - diff].toSorted(() => Math.random() - 0.5);
+  $color.bgcolor.value = toRGB({ h: hues[0], s: 0.2, v: 1 });
+  $color.bodycolor.value = toRGB({ h: hues[1], s: 0.3, v: 0.8 });
+  const strokeHue = (hugeHue + hues[1]) / 2;
+  $color.strokecolor.value = toRGB({ h: strokeHue, s: 0.4, v: 0.3 });
   setColor();
   setPicker();
 };
