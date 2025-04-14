@@ -10,7 +10,7 @@
 >
 <meta
   property="og:image"
-  content="https://i.gyazo.com/69db5ca837ee3d212de5c215573f3f78.png"
+  content="https://i.gyazo.com/7a89959265824c8deeae1bac1085898d.png"
 >
 <meta name="twitter:card" content="summary_large_image" />
 <link rel="icon" href="./favicon.svg" type="image/svg+xml">
@@ -19,7 +19,13 @@
   href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
 >
 <style>
+  main {
+    position: relative;
+  }
   [id="$preview"] {
+    position: sticky;
+    top: 0;
+    z-index: 10;
     aspect-ratio: 1;
     border: #ddd 1px solid;
     margin-bottom: 0.5em;
@@ -35,8 +41,49 @@
       width: 100%;
     }
   }
-  [role="group"] > input[type="color"] {
-    max-width: 50%;
+  label:has(input:disabled) {
+    display: none;
+  }
+  input[type="range"] {
+    touch-action: pinch-zoom;
+  }
+  [id="$colorpicker"] {
+    --thumb-size: 24px;
+    [id="$colorpallet"] {
+      margin: 0 auto var(--thumb-size);
+      position: relative;
+      aspect-ratio: 2/1;
+      max-width: 400px;
+      background-color: hsl(var(--picked-hue, 0) 100% 50%);
+      background-image:
+        linear-gradient(to top, #000, #0000),
+        linear-gradient(to left, #fff0, #fff);
+      touch-action: pinch-zoom;
+    }
+    [id="$colorSV"] {
+      position: absolute;
+      width: var(--thumb-size);
+      height: var(--thumb-size);
+      border: solid 2px #fff;
+      border-radius: 12px;
+      background: transparent;
+      transform: translate(-50%, -50%);
+    }
+    [id="$colorH"] {
+      --pico-range-border-color: transparent;
+      --pico-range-thumb-color: transparent;
+      --pico-range-thumb-active-color: transparent;
+      background: linear-gradient(
+        to right,
+        hsl(0deg 100% 50%),
+        hsl(60deg 100% 50%),
+        hsl(120deg 100% 50%),
+        hsl(180deg 100% 50%),
+        hsl(240deg 100% 50%),
+        hsl(300deg 100% 50%),
+        hsl(360deg 100% 50%)
+      );
+    }
   }
 </style>
 
@@ -47,86 +94,74 @@
   </hgroup>
 </header>
 <main class="container grid">
+  <div id="$preview"></div>
   <div>
+    <form name="huge" id="$huge">
+      <select name="base">
+        <option value="orbio">オルビオ</option>
+        <option value="puge">ピュージ</option>
+      </select>
+    </form>
     <form name="parts" id="$parts">
-      <details class="dropdown">
-        <summary role="button" class="outline secondary">
-          パーツ選択
-        </summary>
-        <ul>
-          <li>
-            <label><input type="checkbox" name="hoshia" checked />星右</label>
-          </li>
-          <li>
-            <label><input type="checkbox" name="hoshib" />星左</label>
-          </li>
-          <li>
-            <label><input type="checkbox" name="hearta" />ハート右</label>
-          </li>
-          <li>
-            <label><input type="checkbox" name="sumi" />スミ入れ</label>
-          </li>
-          <li>
-            <label>
-              <input type="checkbox" name="tunoa" checked />ツノ右上</label>
-          </li>
-          <li>
-            <label>
-              <input type="checkbox" name="tunob" checked />ツノ左上</label>
-          </li>
-          <li>
-            <label>
-              <input type="checkbox" name="tunoc" checked />ツノ右下</label>
-          </li>
-          <li>
-            <label>
-              <input type="checkbox" name="tunod" checked />ツノ左下</label>
-          </li>
-          <li>
-            <label><input type="checkbox" name="drilla" />ドリル右上</label>
-          </li>
-          <li>
-            <label><input type="checkbox" name="drillb" />ドリル左上</label>
-          </li>
-          <li>
-            <label><input type="checkbox" name="ashia" checked />足右</label>
-          </li>
-          <li>
-            <label><input type="checkbox" name="ashib" checked />足左</label>
-          </li>
-        </ul>
-      </details>
+      <h4>パーツ選択</h4>
+      <label><input type="checkbox" name="hoshia" checked>星右</label>
+      <label><input type="checkbox" name="hoshib">星左</label>
+      <label><input type="checkbox" name="hearta">ハート右</label>
+      <label><input type="checkbox" name="sumi">スミ入れ</label>
+      <label><input type="checkbox" name="tunoa" checked>ツノ右上</label>
+      <label><input type="checkbox" name="tunob" checked>ツノ左上</label>
+      <label><input type="checkbox" name="tunoc" checked>ツノ右下</label>
+      <label><input type="checkbox" name="tunod" checked>ツノ左下</label>
+      <label><input type="checkbox" name="drilla">ドリル右上</label>
+      <label><input type="checkbox" name="drillb">ドリル左上</label>
+      <label><input type="checkbox" name="ashia" checked>足右</label>
+      <label><input type="checkbox" name="ashib" checked>足左</label>
+      <label><input type="checkbox" name="mask">仮面</label>
+      <label><input type="checkbox" name="charmy">チャーミィ</label>
+      <label><input type="checkbox" name="yunicap">結爾帽子</label>
+      <label><input type="checkbox" name="dainsleif">私のダインスレイフ</label>
     </form>
     <form name="color" id="$color">
-      <h4>色設定</h4>
+      <h4>色</h4>
       <fieldset role="group">
-        <input type="color" name="bgcolor" value="#ffffff">
-        <label role="button" class="secondary">
-          <input type="checkbox" name="bgtransparent" role="switch">透明
-        </label>
+        <input id="$reset" type="reset" value="デフォルトをセット">
+        <input type="button" id="$random" value="ランダム">
       </fieldset>
+      <label>
+        <input type="checkbox" name="bgtransparent" role="switch">背景透明
+      </label>
+      <input type="color" name="bgcolor" value="#ffffff">
       <input type="color" name="bodycolor" value="#cccccc">
       <input type="color" name="strokecolor" value="#323232">
-      <fieldset role="group">
-        <input type="color" name="hugecolor" value="#80ffa6">
-        <input type="button" id="$random" class="secondary" value="ランダム">
+      <input type="color" name="hugecolor" value="#80ffa6">
+      <fieldset id="$colorpicker">
+        <div id="$colorpallet"><div id="$colorSV"></div></div>
+        <input type="range" min="0" max="360" id="$colorH">
       </fieldset>
-      <input id="$reset" type="reset" value="デフォルトに戻す">
     </form>
-  </div>
-  <article>
-    <div id="$preview"></div>
+    <form name="viewbox" id="$viewbox">
+      <h4>ViewBox</h4>
+      <label>サイズ: <span></span>
+        <input type="range" name="size" min="-50" max="50" value="0">
+      </label>
+      <label>中心X: <span></span>
+        <input type="range" name="x" min="-50" max="50" value="0">
+      </label>
+      <label>中心Y: <span></span>
+        <input type="range" name="y" min="-50" max="50" value="0">
+      </label>
+    </form>
     <form name="output" id="$output">
-      <h4>出力設定</h4>
-      <select name="format" value="png">
+      <h4>出力</h4>
+      <select name="format">
         <option value="svg">SVG</option>
-        <option value="png">PNG</option>
+        <option value="png" selected>PNG</option>
         <option value="jpg">JPG</option>
         <option value="webp">WEBP</option>
       </select>
       <input type="submit" value="ダウンロード">
     </form>
-  </article>
+  </div>
 </main>
 <footer class="container">
   <hr>

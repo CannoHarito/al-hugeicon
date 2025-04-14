@@ -1,7 +1,7 @@
 {
   "tasks": {
-    "dev-serve": "deno -NR --watch=. jsr:@std/http/file-server",
-    "dev-build": "deno -A --watch=./main.ts jsr:@kt3k/pack main.ts -o main.js",
+    "dev-serve": "deno -NR jsr:@std/http/file-server",
+    "dev-build": "deno -A --watch=src jsr:@kt3k/pack src/main.ts -o main.js",
     "dev": {
       "dependencies": ["dev-build", "dev-serve"]
     },
