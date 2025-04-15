@@ -58,7 +58,7 @@ var parts = [
   ["hoshia", "hoshib", "hearta", "sumi"],
   ["tunoa", "tunob", "tunoc", "tunod", "drilla", "drillb"],
   ["ashia", "ashib"],
-  ["yunicap", "dainsleif"]
+  ["yunicap", "dainsleif", "twinebifry"]
 ].flat();
 var draw = ({
   parts: parts3 = ["hoshia", "tunoa", "tunob", "tunoc", "tunod", "ashia", "ashib"],
@@ -208,6 +208,17 @@ var draw = ({
   <path d="m0 52 4 10-4 7m-5-90c0 2-1 3-3 3s-3-1-3-3 1-3 3-3 3 1 3 3zm29 64c0 2 1 3 3 3s3-1 3-3-1-3-3-3-3 1-3 3zm7-41s-2 23-1 23 8-22 8-22m-62 40c0 2-1 3-3 3s-3-1-3-3 1-3 3-3 3 1 3 3zm-7-41s2 23 1 23-8-22-8-22" fill="none"/>
   <path d="m-21 71-6 4-6-1-7 5m60-8 12 4h7l7 4m-69-11h-7l-5-3-9 1m69 2 8-2 8 1 5-2" fill="none"/>
 </g>`);
+  }
+  if (parts3.includes("twinebifry")) {
+    svgChildren.push(`<g id="ebifryA" stroke-linejoin="round" stroke-width="3" stroke="${strokecolor}">
+  <path d="m143-150s10-53-1-68c-4-5-10-5-14-1-6 6-6 33-6 33s-17-15-22-8c-3 2-5 11-3 17 7 22 41 34 41 34z" fill="#ff9f3f"/>
+  <path d="m120-191c11 10 19 25 23 41l-5 7c-7-15-16-33-18-48z" fill="#ff9f3f"/>
+  <path d="m131-143c-3 3-6 7-6 11s2 9 6 11c-4 16 3 14 3 17-3 9 3 15 5 17-5 10 4 16 4 16-3 8 2 15 5 16-2 5 2 15 3 16-2 5 3 16 3 16-1 2-5 11 2 17-4 8 0 15 2 16 0 0-8 10 0 17-5 10 0 15 1 16-4 5-3 13 1 17-8 8 0 17 1 17-7 8-2 17-1 18-5 6 0 17 0 17-4 6-4 12 1 17-5 13 2 13 2 19-6 9 2 15 5 18-6 13 23 21 23 11 5 1 17-1 18-14 0 0 0-1-1-1 7-3 10-10 9-17 4-4 7-12 5-18 4-3 5-14 5-14 2-3 6-14 2-19 5-5 6-13 1-18 5-7 3-15 1-17 4-6 4-13 0-17 4-6 2-12-1-17 4-7 3-13-2-18 1-2 4-11-2-17 3-11-6-16-4-17 1-2 3-12-5-16 6-10-4-17-4-17 3-8-2-12-6-17 2-6-6-15-7-16 2-8-2-13-9-16 1-11-6-14-9-14-3-11-10-15-10-15-2-9-7-13-16-14-8-12-29 0-25 9z" fill="#fd9"/>
+  <path transform="translate(148,-122) rotate(-30)" d="m-14-10c7 2 9 5 8 8s-4 4-11 2-14-7-14-10c1-3 10-2 17 0zm30 10c-6 2-9 1-10-2-1-2 1-5 8-8 7-2 16-3 17-0s-7 7-14 10zm-11 16c-4-6-4-10-1-11 2-2 5-1 9 5 5 6 8 14 6 16s-9-4-14-10zm-18-6c4-6 8-7 10-5s2 5-2 11-11 12-13 10 1-10 5-16zm18-26c0 7-2 10-5 10s-5-3-5-10 2-16 5-16 5 9 5 16zm0 16a5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5z" fill="#e2e2ff"/>
+</g>
+<path d="m151 24 76-44 2 9-74 46z" fill="#4d3559" stroke="${strokecolor}" stroke-linejoin="round" stroke-width="3"/>
+<path d="m236 7-86-39-1 9 87 39z" fill="#4d3559" stroke="${strokecolor}" stroke-linejoin="round" stroke-width="3"/>
+<use transform="scale(-1,1)" href="#ebifryA"/>`);
   }
   return [
     `<svg viewBox="${viewboxString}" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
