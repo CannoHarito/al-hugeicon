@@ -12,14 +12,16 @@ var throttle = (func, timeout = 100) => {
     cooltimePromise = new Promise((r) => setTimeout(() => r(), timeout));
   };
 };
-var colorNames = [
-  "bgcolor",
-  "bodycolor",
-  "strokecolor",
-  "hugecolor",
-  "blackcolor",
-  "greycolor"
-];
+var defaultColor = {
+  bgcolor: "#ffffff",
+  bodycolor: "#cccccc",
+  strokecolor: "#323232",
+  hugecolor: "#80ffa6",
+  blackcolor: "#323232",
+  greycolor: "#6e6e6e"
+};
+var getColor = (...colors) => Object.assign({}, defaultColor, ...colors);
+var colorNames = Object.keys(defaultColor);
 function getStyleString(formdata) {
   const styles = [...formdata].filter(([k]) => colorNames.includes(k)).map(([k, v]) => `--${k}:${v};`);
   if (!formdata.has("bgtransparent")) {
@@ -60,13 +62,18 @@ var parts = [
   ["ashia", "ashib"],
   ["yunicap", "dainsleif", "twinebifry"]
 ].flat();
+var color = {
+  bodycolor: "#cccccc",
+  strokecolor: "#323232",
+  hugecolor: "#80ffa6"
+};
 var draw = ({
   parts: parts3 = ["hoshia", "tunoa", "tunob", "tunoc", "tunod", "ashia", "ashib"],
-  color,
+  color: color3,
   viewbox,
   style
 } = {}) => {
-  const svgStyle = color ? getStyleString(color) : "";
+  const svgStyle = color3 ? getStyleString(color3) : "";
   const viewboxString = viewbox ? getViewboxString(viewbox) : "-256 -256 512 512";
   const bodycolor = "var(--bodycolor, #ccc)", strokecolor = "var(--strokecolor, #323232)", hugecolor = "var(--hugecolor, #80ffa6)", blackcolor = "var(--blackcolor, #323232)", greycolor = "var(--greycolor, #6e6e6e)";
   const svgChildren = [];
@@ -230,7 +237,7 @@ var draw = ({
     `</svg>`
   ].join("\n");
 };
-var orbio = { name, parts, draw };
+var orbio = { name, parts, color, draw };
 
 // src/puge.ts
 var name2 = "puge";
@@ -240,8 +247,13 @@ var parts2 = [
   ["ashia", "ashib"],
   ["mask", "charmy"]
 ].flat();
-var draw2 = ({ parts: parts3 = [], color, viewbox, style }) => {
-  const svgStyle = color ? getStyleString(color) : "";
+var color2 = {
+  bodycolor: "#e6a1a1",
+  strokecolor: "#323232",
+  hugecolor: "#ff80aa"
+};
+var draw2 = ({ parts: parts3 = [], color: color3, viewbox, style }) => {
+  const svgStyle = color3 ? getStyleString(color3) : "";
   const viewboxString = viewbox ? getViewboxString(viewbox) : "-256 -256 512 512";
   const bodycolor = "var(--bodycolor, #ccc)", strokecolor = "var(--strokecolor, #323232)", hugecolor = "var(--hugecolor, #80ffa6)", blackcolor = "var(--blackcolor, #323232)", greycolor = "var(--greycolor, #6e6e6e)";
   const svgChildren = [];
@@ -359,7 +371,7 @@ var draw2 = ({ parts: parts3 = [], color, viewbox, style }) => {
     `</svg>`
   ].join("\n");
 };
-var puge = { name: name2, parts: parts2, draw: draw2 };
+var puge = { name: name2, parts: parts2, color: color2, draw: draw2 };
 
 // src/colorpicker.ts
 var inputType = "inputfrompicker";
@@ -458,9 +470,13 @@ var setColor = throttle(() => {
     $svg.style.cssText = getStyleString(new FormData($color));
 });
 $color.oninput = setColor;
-$reset.onclick = (e) => {
+var $colorInputs = [...$color.elements].filter(isInput).filter(
+  (el) => el.type === "color"
+);
+$color.onreset = (e) => {
   e.preventDefault();
-  $color.reset();
+  const hugeDefaultColor = getColor(huge.color);
+  $colorInputs.forEach(($i) => $i.value = hugeDefaultColor[$i.name]);
   setColor();
   setPicker();
 };
@@ -534,7 +550,4 @@ $output.onsubmit = () => {
 setHuge();
 setViewbox();
 setSVG();
-var $colorInputs = [...$color.elements].filter(isInput).filter(
-  (el) => el.type === "color"
-);
 initColorPicker($colorInputs);

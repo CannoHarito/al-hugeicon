@@ -7,6 +7,11 @@ const parts = [
   ["ashia", "ashib"],
   ["yunicap", "dainsleif", "twinebifry"],
 ].flat();
+const color = {
+  bodycolor: "#cccccc",
+  strokecolor: "#323232",
+  hugecolor: "#80ffa6",
+};
 const draw: Huge["draw"] = ({
   parts = ["hoshia", "tunoa", "tunob", "tunoc", "tunod", "ashia", "ashib"],
   color,
@@ -200,4 +205,4 @@ const draw: Huge["draw"] = ({
   ].join("\n");
 };
 
-export const orbio: Huge = { name, parts, draw };
+export const orbio: Huge = { name, parts, color, draw };

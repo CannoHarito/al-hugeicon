@@ -1,4 +1,5 @@
 import {
+  getColor,
   getStyleString,
   getViewboxString,
   Huge,
@@ -17,7 +18,6 @@ declare const $random: HTMLInputElement;
 declare const $output: HTMLFormElement;
 declare const $viewbox: HTMLFormElement;
 declare const $preview: HTMLElement;
-declare const $reset: HTMLInputElement;
 
 const huges: Huge[] = [orbio, puge];
 let huge = huges[0];
@@ -52,9 +52,13 @@ const setColor = throttle(() => {
   if ($svg) $svg.style.cssText = getStyleString(new FormData($color));
 });
 $color.oninput = setColor;
-$reset.onclick = (e) => {
+const $colorInputs = [...$color.elements].filter(isInput).filter((el) =>
+  el.type === "color"
+);
+$color.onreset = (e) => {
   e.preventDefault();
-  $color.reset();
+  const hugeDefaultColor = getColor(huge.color);
+  $colorInputs.forEach(($i) => $i.value = hugeDefaultColor[$i.name]);
   setColor();
   setPicker();
 };
@@ -135,7 +139,4 @@ $output.onsubmit = () => {
 setHuge();
 setViewbox();
 setSVG();
-const $colorInputs = [...$color.elements].filter(isInput).filter((el) =>
-  el.type === "color"
-);
 initColorPicker($colorInputs);

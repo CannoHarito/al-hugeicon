@@ -14,6 +14,7 @@ export interface Huge {
   name: string;
   draw: (options: Partial<DrawOptions>) => string;
   parts: string[];
+  color: Record<string, string>;
 }
 export interface DrawOptions {
   parts: string[];
@@ -21,14 +22,18 @@ export interface DrawOptions {
   viewbox: FormData;
   style: string;
 }
-export const colorNames = [
-  "bgcolor",
-  "bodycolor",
-  "strokecolor",
-  "hugecolor",
-  "blackcolor",
-  "greycolor",
-];
+const defaultColor = {
+  bgcolor: "#ffffff",
+  bodycolor: "#cccccc",
+  strokecolor: "#323232",
+  hugecolor: "#80ffa6",
+  blackcolor: "#323232",
+  greycolor: "#6e6e6e",
+};
+export const getColor = <R = Record<string, string>>(
+  ...colors: R[]
+) => Object.assign({}, defaultColor, ...colors) as typeof defaultColor & R;
+const colorNames = Object.keys(defaultColor);
 export function getStyleString(formdata: FormData) {
   const styles: string[] = [...formdata]
     .filter(([k]) => colorNames.includes(k))
@@ -48,6 +53,11 @@ export function getViewboxString(formdata: FormData, { svgSize = 512 } = {}) {
 }
 export const clamp = (n: number, min = 0, max = 1) =>
   Math.min(max, Math.max(min, n));
+export interface HSV {
+  h: number;
+  s: number;
+  v: number;
+}
 export const toRGB = ({ h = 360, s = 0.5, v = 1 }: Partial<HSV> = {}) => {
   h = (h < 0 ? h % 360 + 360 : h) % 360 / 60;
   s = clamp(s, 0, 1);
@@ -59,11 +69,6 @@ export const toRGB = ({ h = 360, s = 0.5, v = 1 }: Partial<HSV> = {}) => {
   );
   return `#${(r << 16 | g << 8 | b).toString(16).padStart(6, "0")}`;
 };
-export interface HSV {
-  h: number;
-  s: number;
-  v: number;
-}
 export const toHSV = (rgb: string = "#ff8080"): HSV => {
   const rgbNum = parseInt(rgb.replaceAll(/[^a-f\d]/ig, ""), 16),
     [r, g, b] = [16, 8, 0].map((n) => rgbNum >> n & 0xff),
