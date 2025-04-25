@@ -5,7 +5,7 @@ const parts = [
   ["hoshia", "hoshib", "hearta", "sumi"],
   ["tunoa", "tunob", "tunoc", "tunod", "drilla", "drillb"],
   ["ashia", "ashib"],
-  ["yunicap", "dainsleif", "twinebifry"],
+  ["yunicap", "dainsleif", "twinebifry", "arayasearch"],
 ].flat();
 const color = {
   bodycolor: "#cccccc",
@@ -193,6 +193,21 @@ const draw: Huge["draw"] = ({
 <path d="m151 24 76-44 2 9-74 46z" fill="#4d3559" stroke="${strokecolor}" stroke-linejoin="round" stroke-width="3"/>
 <path d="m236 7-86-39-1 9 87 39z" fill="#4d3559" stroke="${strokecolor}" stroke-linejoin="round" stroke-width="3"/>
 <use transform="scale(-1,1)" href="#ebifryA"/>`);
+  }
+  if (parts.includes("arayasearch")) {
+    svgChildren.push(`\
+<g id="searchA" stroke-linejoin="round" stroke-width="3">
+  <path d="m45-119c21-21 40-29 78-36 2 0 6 1 6 2 4 21-2 61-8 88" fill="#9e3438" stroke="#42364a"/>
+  <path d="m50-124c-8-1-13 4-16 8 43 11 65 36 86 66 1-4 3-11 1-16-20-31-45-49-71-58z" fill="#f2b179" stroke="#42364a"/>
+  <path d="m124-79-3 14-8-12-20-37 26-40h8l4 7-23 34z" fill="#42364a"/>
+</g>
+<use transform="scale(-1,1)" href="#searchA"/>
+<g stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+  <path d="m-117-139c4-1 11 8 11 8s11-2 13 3c2 3-2 11-2 11s4 15-1 19c-3 3-13-1-13-1s-9 8-13 6-4-14-4-14-9-6-9-10 9-9 9-9 2-12 9-13z" fill="#732f2e" stroke="#42364a"/>
+  <path d="m-116-123c0 12 4 5 10 11m-14-2c8-4 7 1 10-9" fill="none" stroke="#f2b179"/>
+  <path d="m122-117c-2 0-4 2-4 8 15 5 28 21 7 29l-2 8s9-1 13-4c13-10 8-36-14-41z" fill="#f2b179" stroke="#42364a"/>
+</g>
+`);
   }
   return [
     `<svg viewBox="${viewboxString}" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
