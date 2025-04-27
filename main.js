@@ -12,14 +12,16 @@ var throttle = (func, timeout = 100) => {
     cooltimePromise = new Promise((r) => setTimeout(() => r(), timeout));
   };
 };
-var colorNames = [
-  "bgcolor",
-  "bodycolor",
-  "strokecolor",
-  "hugecolor",
-  "blackcolor",
-  "greycolor"
-];
+var defaultColor = {
+  bgcolor: "#ffffff",
+  bodycolor: "#cccccc",
+  strokecolor: "#323232",
+  hugecolor: "#80ffa6",
+  blackcolor: "#323232",
+  greycolor: "#6e6e6e"
+};
+var getColor = (...colors) => Object.assign({}, defaultColor, ...colors);
+var colorNames = Object.keys(defaultColor);
 function getStyleString(formdata) {
   const styles = [...formdata].filter(([k]) => colorNames.includes(k)).map(([k, v]) => `--${k}:${v};`);
   if (!formdata.has("bgtransparent")) {
@@ -58,15 +60,20 @@ var parts = [
   ["hoshia", "hoshib", "hearta", "sumi"],
   ["tunoa", "tunob", "tunoc", "tunod", "drilla", "drillb"],
   ["ashia", "ashib"],
-  ["yunicap", "dainsleif"]
+  ["yunicap", "dainsleif", "twinebifry", "arayasearch"]
 ].flat();
+var color = {
+  bodycolor: "#cccccc",
+  strokecolor: "#323232",
+  hugecolor: "#80ffa6"
+};
 var draw = ({
   parts: parts3 = ["hoshia", "tunoa", "tunob", "tunoc", "tunod", "ashia", "ashib"],
-  color,
+  color: color3,
   viewbox,
   style
 } = {}) => {
-  const svgStyle = color ? getStyleString(color) : "";
+  const svgStyle = color3 ? getStyleString(color3) : "";
   const viewboxString = viewbox ? getViewboxString(viewbox) : "-256 -256 512 512";
   const bodycolor = "var(--bodycolor, #ccc)", strokecolor = "var(--strokecolor, #323232)", hugecolor = "var(--hugecolor, #80ffa6)", blackcolor = "var(--blackcolor, #323232)", greycolor = "var(--greycolor, #6e6e6e)";
   const svgChildren = [];
@@ -209,6 +216,31 @@ var draw = ({
   <path d="m-21 71-6 4-6-1-7 5m60-8 12 4h7l7 4m-69-11h-7l-5-3-9 1m69 2 8-2 8 1 5-2" fill="none"/>
 </g>`);
   }
+  if (parts3.includes("twinebifry")) {
+    svgChildren.push(`<g id="ebifryA" stroke-linejoin="round" stroke-width="3" stroke="${strokecolor}">
+  <path d="m143-150s10-53-1-68c-4-5-10-5-14-1-6 6-6 33-6 33s-17-15-22-8c-3 2-5 11-3 17 7 22 41 34 41 34z" fill="#ff9f3f"/>
+  <path d="m120-191c11 10 19 25 23 41l-5 7c-7-15-16-33-18-48z" fill="#ff9f3f"/>
+  <path d="m131-143c-3 3-6 7-6 11s2 9 6 11c-4 16 3 14 3 17-3 9 3 15 5 17-5 10 4 16 4 16-3 8 2 15 5 16-2 5 2 15 3 16-2 5 3 16 3 16-1 2-5 11 2 17-4 8 0 15 2 16 0 0-8 10 0 17-5 10 0 15 1 16-4 5-3 13 1 17-8 8 0 17 1 17-7 8-2 17-1 18-5 6 0 17 0 17-4 6-4 12 1 17-5 13 2 13 2 19-6 9 2 15 5 18-6 13 23 21 23 11 5 1 17-1 18-14 0 0 0-1-1-1 7-3 10-10 9-17 4-4 7-12 5-18 4-3 5-14 5-14 2-3 6-14 2-19 5-5 6-13 1-18 5-7 3-15 1-17 4-6 4-13 0-17 4-6 2-12-1-17 4-7 3-13-2-18 1-2 4-11-2-17 3-11-6-16-4-17 1-2 3-12-5-16 6-10-4-17-4-17 3-8-2-12-6-17 2-6-6-15-7-16 2-8-2-13-9-16 1-11-6-14-9-14-3-11-10-15-10-15-2-9-7-13-16-14-8-12-29 0-25 9z" fill="#fd9"/>
+  <path transform="translate(148,-122) rotate(-30)" d="m-14-10c7 2 9 5 8 8s-4 4-11 2-14-7-14-10c1-3 10-2 17 0zm30 10c-6 2-9 1-10-2-1-2 1-5 8-8 7-2 16-3 17-0s-7 7-14 10zm-11 16c-4-6-4-10-1-11 2-2 5-1 9 5 5 6 8 14 6 16s-9-4-14-10zm-18-6c4-6 8-7 10-5s2 5-2 11-11 12-13 10 1-10 5-16zm18-26c0 7-2 10-5 10s-5-3-5-10 2-16 5-16 5 9 5 16zm0 16a5 5 0 0 1-5 5 5 5 0 0 1-5-5 5 5 0 0 1 5-5 5 5 0 0 1 5 5z" fill="#e2e2ff"/>
+</g>
+<path d="m151 24 76-44 2 9-74 46z" fill="#4d3559" stroke="${strokecolor}" stroke-linejoin="round" stroke-width="3"/>
+<path d="m236 7-86-39-1 9 87 39z" fill="#4d3559" stroke="${strokecolor}" stroke-linejoin="round" stroke-width="3"/>
+<use transform="scale(-1,1)" href="#ebifryA"/>`);
+  }
+  if (parts3.includes("arayasearch")) {
+    svgChildren.push(`<g id="searchA" stroke-linejoin="round" stroke-width="3">
+  <path d="m45-119c21-21 40-29 78-36 2 0 6 1 6 2 4 21-2 61-8 88" fill="#9e3438" stroke="#42364a"/>
+  <path d="m50-124c-8-1-13 4-16 8 43 11 65 36 86 66 1-4 3-11 1-16-20-31-45-49-71-58z" fill="#f2b179" stroke="#42364a"/>
+  <path d="m124-79-3 14-8-12-20-37 26-40h8l4 7-23 34z" fill="#42364a"/>
+</g>
+<use transform="scale(-1,1)" href="#searchA"/>
+<g stroke-linecap="round" stroke-linejoin="round" stroke-width="3">
+  <path d="m-117-139c4-1 11 8 11 8s11-2 13 3c2 3-2 11-2 11s4 15-1 19c-3 3-13-1-13-1s-9 8-13 6-4-14-4-14-9-6-9-10 9-9 9-9 2-12 9-13z" fill="#732f2e" stroke="#42364a"/>
+  <path d="m-116-123c0 12 4 5 10 11m-14-2c8-4 7 1 10-9" fill="none" stroke="#f2b179"/>
+  <path d="m122-117c-2 0-4 2-4 8 15 5 28 21 7 29l-2 8s9-1 13-4c13-10 8-36-14-41z" fill="#f2b179" stroke="#42364a"/>
+</g>
+`);
+  }
   return [
     `<svg viewBox="${viewboxString}" xmlns="http://www.w3.org/2000/svg" style="${svgStyle}">`,
     ...style ? [`<style>`, style, `</style>`] : [],
@@ -219,7 +251,7 @@ var draw = ({
     `</svg>`
   ].join("\n");
 };
-var orbio = { name, parts, draw };
+var orbio = { name, parts, color, draw };
 
 // src/puge.ts
 var name2 = "puge";
@@ -229,8 +261,13 @@ var parts2 = [
   ["ashia", "ashib"],
   ["mask", "charmy"]
 ].flat();
-var draw2 = ({ parts: parts3 = [], color, viewbox, style }) => {
-  const svgStyle = color ? getStyleString(color) : "";
+var color2 = {
+  bodycolor: "#e6a1a1",
+  strokecolor: "#323232",
+  hugecolor: "#ff80aa"
+};
+var draw2 = ({ parts: parts3 = [], color: color3, viewbox, style }) => {
+  const svgStyle = color3 ? getStyleString(color3) : "";
   const viewboxString = viewbox ? getViewboxString(viewbox) : "-256 -256 512 512";
   const bodycolor = "var(--bodycolor, #ccc)", strokecolor = "var(--strokecolor, #323232)", hugecolor = "var(--hugecolor, #80ffa6)", blackcolor = "var(--blackcolor, #323232)", greycolor = "var(--greycolor, #6e6e6e)";
   const svgChildren = [];
@@ -348,7 +385,7 @@ var draw2 = ({ parts: parts3 = [], color, viewbox, style }) => {
     `</svg>`
   ].join("\n");
 };
-var puge = { name: name2, parts: parts2, draw: draw2 };
+var puge = { name: name2, parts: parts2, color: color2, draw: draw2 };
 
 // src/colorpicker.ts
 var inputType = "inputfrompicker";
@@ -447,14 +484,25 @@ var setColor = throttle(() => {
     $svg.style.cssText = getStyleString(new FormData($color));
 });
 $color.oninput = setColor;
-$reset.onclick = (e) => {
+var $colorInputs = [...$color.elements].filter(isInput).filter(
+  (el) => el.type === "color"
+);
+$color.onreset = (e) => {
   e.preventDefault();
-  $color.reset();
+  const hugeDefaultColor = getColor(huge.color);
+  $colorInputs.forEach(($i) => $i.value = hugeDefaultColor[$i.name]);
   setColor();
   setPicker();
 };
 $random.onclick = () => {
-  $color.hugecolor.value = toRGB({ h: Math.random() * 360, s: 0.5, v: 1 });
+  const hugeHue = Math.random() * 360;
+  const diff = +($randommode.value ?? "120");
+  $color.hugecolor.value = toRGB({ h: hugeHue, s: 0.5, v: 1 });
+  const hues = [hugeHue + diff, hugeHue - diff].toSorted(() => Math.random() - 0.5);
+  $color.bgcolor.value = toRGB({ h: hues[0], s: 0.2, v: 1 });
+  $color.bodycolor.value = toRGB({ h: hues[1], s: 0.3, v: 0.8 });
+  const strokeHue = (hugeHue + hues[1]) / 2;
+  $color.strokecolor.value = toRGB({ h: strokeHue, s: 0.4, v: 0.3 });
   setColor();
   setPicker();
 };
@@ -516,7 +564,4 @@ $output.onsubmit = () => {
 setHuge();
 setViewbox();
 setSVG();
-var $colorInputs = [...$color.elements].filter(isInput).filter(
-  (el) => el.type === "color"
-);
 initColorPicker($colorInputs);

@@ -7,6 +7,11 @@ const parts = [
   ["ashia", "ashib"],
   ["mask", "charmy"],
 ].flat();
+const color = {
+  bodycolor: "#e6a1a1",
+  strokecolor: "#323232",
+  hugecolor: "#ff80aa",
+};
 const draw: Huge["draw"] = (
   { parts = [], color, viewbox, style },
 ) => {
@@ -159,4 +164,4 @@ const draw: Huge["draw"] = (
   ].join("\n");
 };
 
-export const puge: Huge = { name, parts, draw };
+export const puge: Huge = { name, parts, color, draw };
